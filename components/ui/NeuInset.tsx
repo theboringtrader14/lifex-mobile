@@ -13,34 +13,38 @@ export function NeuInset({ children, style, borderRadius = 20, padding }: Props)
   return (
     <View style={[{
       borderRadius,
-      backgroundColor: '#D8E0ED',
-      borderWidth: 1.5,
-      borderTopColor: T.shadowDI,
-      borderLeftColor: T.shadowDI,
-      borderBottomColor: T.shadowLI,
-      borderRightColor: T.shadowLI,
+      backgroundColor: '#D1D9E6',
       overflow: 'hidden',
+      borderWidth: 1.5,
+      borderTopColor: 'rgba(163,177,198,0.55)',
+      borderLeftColor: 'rgba(163,177,198,0.55)',
+      borderBottomColor: 'rgba(255,255,255,0.88)',
+      borderRightColor: 'rgba(255,255,255,0.88)',
       ...(padding !== undefined ? { padding } : {}),
     }, style]}>
-      {/* Inner dark shadow top-left */}
+      {/* Inner dark gradient — top edge */}
       <View style={{
-        position: 'absolute', top: -8, left: -8, width: '120%', height: '120%',
-        borderRadius: borderRadius + 8,
-        backgroundColor: 'transparent',
-        shadowColor: '#A3B1C6',
-        shadowOffset: { width: 4, height: 4 },
-        shadowOpacity: 0.6,
-        shadowRadius: 10,
+        position: 'absolute', top: 0, left: 0, right: 0, height: 10,
+        borderTopLeftRadius: borderRadius, borderTopRightRadius: borderRadius,
+        backgroundColor: 'rgba(163,177,198,0.18)',
       }} pointerEvents="none" />
-      {/* Inner light shadow bottom-right */}
+      {/* Inner dark gradient — left edge */}
       <View style={{
-        position: 'absolute', bottom: -8, right: -8, width: '120%', height: '120%',
-        borderRadius: borderRadius + 8,
-        backgroundColor: 'transparent',
-        shadowColor: '#FFFFFF',
-        shadowOffset: { width: -3, height: -3 },
-        shadowOpacity: 0.85,
-        shadowRadius: 8,
+        position: 'absolute', top: 0, left: 0, bottom: 0, width: 10,
+        borderTopLeftRadius: borderRadius, borderBottomLeftRadius: borderRadius,
+        backgroundColor: 'rgba(163,177,198,0.12)',
+      }} pointerEvents="none" />
+      {/* Inner light gradient — bottom edge */}
+      <View style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: 8,
+        borderBottomLeftRadius: borderRadius, borderBottomRightRadius: borderRadius,
+        backgroundColor: 'rgba(255,255,255,0.55)',
+      }} pointerEvents="none" />
+      {/* Inner light gradient — right edge */}
+      <View style={{
+        position: 'absolute', top: 0, right: 0, bottom: 0, width: 8,
+        borderTopRightRadius: borderRadius, borderBottomRightRadius: borderRadius,
+        backgroundColor: 'rgba(255,255,255,0.4)',
       }} pointerEvents="none" />
       {children}
     </View>

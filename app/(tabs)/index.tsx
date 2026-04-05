@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { NeuCard } from '../../components/ui/NeuCard';
@@ -25,6 +25,31 @@ const WIDGETS = [
   { color: T.purple, label: 'BUDGET', value: '₹18.4K', sub: 'this month', subColor: T.textM, route: '/budget' },
 ];
 
+function WidgetCard({ w }: { w: typeof WIDGETS[0] }) {
+  const [pressed, setPressed] = React.useState(false);
+  return (
+    <Pressable
+      style={{ flex: 1 }}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      onPress={() => router.push(w.route as any)}
+    >
+      <NeuCard style={{ flex: 1 }} borderRadius={20} overflow="hidden" pressed={pressed}>
+        <View style={[s.accent, { backgroundColor: w.color }]} />
+        <View style={{ paddingTop: 14, paddingHorizontal: 12, paddingBottom: 32 }}>
+          <View style={[s.dot, { backgroundColor: w.color }]} />
+          <Text style={s.wLbl}>{w.label}</Text>
+          <Text style={s.wVal}>{w.value}</Text>
+          <Text style={[s.wSub, { color: w.subColor }]}>{w.sub}</Text>
+        </View>
+        <View style={s.arrowCircle}>
+          <ArrowIcon />
+        </View>
+      </NeuCard>
+    </Pressable>
+  );
+}
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   return (
@@ -48,58 +73,44 @@ export default function HomeScreen() {
 
       {/* Widget cards */}
       <View style={s.widgetRow}>
-        {WIDGETS.map((w) => (
-          <TouchableOpacity key={w.label} style={{ flex: 1 }} onPress={() => router.push(w.route as any)} activeOpacity={0.85}>
-            <NeuCard style={{ flex: 1 }} borderRadius={20} overflow="hidden">
-              {/* Accent bar */}
-              <View style={[s.accent, { backgroundColor: w.color }]} />
-              <View style={{ paddingTop: 14, paddingHorizontal: 12, paddingBottom: 32 }}>
-                <View style={[s.dot, { backgroundColor: w.color }]} />
-                <Text style={s.wLbl}>{w.label}</Text>
-                <Text style={s.wVal}>{w.value}</Text>
-                <Text style={[s.wSub, { color: w.subColor }]}>{w.sub}</Text>
-              </View>
-              {/* Arrow circle */}
-              <View style={s.arrowCircle}>
-                <ArrowIcon />
-              </View>
-            </NeuCard>
-          </TouchableOpacity>
-        ))}
+        {WIDGETS.map((w) => <WidgetCard key={w.label} w={w} />)}
       </View>
 
       {/* Stats strip */}
-      <NeuCard style={s.statsStrip} borderRadius={20} overflow="hidden">
-        {[
-          { num: '21', lbl: 'ACTIVE ALGOS', color: T.textH },
-          { num: '0', lbl: 'OPEN POS.', color: T.textH },
-          { num: '₹0', lbl: 'TODAY P&L', color: T.teal },
-        ].map((stat, i) => (
-          <React.Fragment key={stat.lbl}>
-            {i > 0 && <View style={s.divider} />}
-            <View style={s.statItem}>
-              <Text style={[s.statNum, { color: stat.color }]}>{stat.num}</Text>
-              <Text style={s.statLbl}>{stat.lbl}</Text>
-            </View>
-          </React.Fragment>
-        ))}
+      <NeuCard style={{ marginHorizontal: 16, marginTop: 14 }} borderRadius={20} overflow="hidden">
+        <View style={{ flexDirection: 'row', paddingVertical: 16 }}>
+          <View style={s.statItem}>
+            <Text style={[s.statNum, { color: T.textH }]}>21</Text>
+            <Text style={s.statLbl}>ACTIVE ALGOS</Text>
+          </View>
+          <View style={{ width: 1, backgroundColor: 'rgba(163,177,198,0.4)', marginVertical: '12%' }} />
+          <View style={s.statItem}>
+            <Text style={[s.statNum, { color: T.textH }]}>0</Text>
+            <Text style={s.statLbl}>OPEN POS.</Text>
+          </View>
+          <View style={{ width: 1, backgroundColor: 'rgba(163,177,198,0.4)', marginVertical: '12%' }} />
+          <View style={s.statItem}>
+            <Text style={[s.statNum, { color: T.teal }]}>₹0</Text>
+            <Text style={s.statLbl}>TODAY P&L</Text>
+          </View>
+        </View>
       </NeuCard>
 
-      <SectionLabel label="LIFEX AI" style={{ marginTop: 14 }} />
+      <SectionLabel label="ADD EXPENSE" style={{ marginTop: 14 }} />
 
       {/* Voice section */}
       <View style={s.voiceWrap}>
         <View style={s.voiceBoxOuter}>
           <NeuInset style={s.voiceBox}>
-            <Text style={s.voiceHint}>LISTENING…</Text>
-            <Text style={s.voiceText}>Which algo performed best this week?</Text>
+            <Text style={s.voiceHint}>SAY YOUR EXPENSE…</Text>
+            <Text style={s.voiceText}>e.g. "Swiggy 350 food"</Text>
           </NeuInset>
           {/* Mic button absolutely anchored at bottom of voice box, overhanging by 33px */}
           <View style={s.micAnchor}>
             <MicButton onPress={() => {}} listening />
           </View>
         </View>
-        <Text style={s.tapHint}>TAP TO SPEAK TO LIFEX AI</Text>
+        <Text style={s.tapHint}>TAP MIC TO RECORD EXPENSE</Text>
       </View>
     </ScrollView>
   );
@@ -127,16 +138,15 @@ const s = StyleSheet.create({
     backgroundColor: T.base, alignItems: 'center', justifyContent: 'center',
     shadowColor: '#A3B1C6', shadowOffset: { width: 2, height: 2 }, shadowOpacity: 0.75, shadowRadius: 5, elevation: 3,
   },
-  statsStrip: { flexDirection: 'row', marginHorizontal: 16, marginTop: 14, paddingVertical: 16 },
+  statsStrip: { marginHorizontal: 16, marginTop: 14 },
   statItem: { flex: 1, alignItems: 'center' },
   statNum: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 20, fontWeight: '600', marginBottom: 4 },
   statLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', color: T.textS, fontFamily: 'Syne_700Bold' },
-  divider: { width: 1, backgroundColor: 'rgba(163,177,198,0.4)', marginVertical: '12%' },
   voiceWrap: { paddingHorizontal: 16, alignItems: 'center' },
-  voiceBoxOuter: { width: '100%', position: 'relative', marginBottom: 33 },
+  voiceBoxOuter: { width: '100%', position: 'relative', marginBottom: 30 },
   voiceBox: { width: '100%', paddingTop: 18, paddingHorizontal: 20, paddingBottom: 64, minHeight: 130 },
   voiceHint: { fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: T.textS, marginBottom: 10, fontFamily: 'Syne_700Bold' },
   voiceText: { fontSize: 14, color: T.textB, lineHeight: 22, fontStyle: 'italic', fontFamily: 'Syne_400Regular' },
-  micAnchor: { position: 'absolute', bottom: -33, left: 0, right: 0, alignItems: 'center' },
-  tapHint: { marginTop: 40, fontSize: 10, color: T.textS, letterSpacing: 0.8, textTransform: 'uppercase', fontWeight: '600', fontFamily: 'Syne_700Bold' },
+  micAnchor: { position: 'absolute', bottom: -30, left: 0, right: 0, alignItems: 'center' },
+  tapHint: { marginTop: 40, fontSize: 10, color: T.textS, letterSpacing: 0.8, textTransform: 'uppercase', fontWeight: '700', fontFamily: 'Syne_700Bold' },
 });

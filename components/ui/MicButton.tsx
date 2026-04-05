@@ -1,40 +1,50 @@
-import React, { useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import Svg, { Rect, Path, Line } from 'react-native-svg';
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, withDelay } from 'react-native-reanimated';
 import { T } from '../../theme';
 
 interface Props { onPress: () => void; listening?: boolean }
 
 export function MicButton({ onPress, listening = false }: Props) {
-  const ring1Scale = useSharedValue(0.94);
-  const ring1Opacity = useSharedValue(1);
-  const ring2Scale = useSharedValue(0.94);
-  const ring2Opacity = useSharedValue(1);
+  const ring1Scale = useRef(new Animated.Value(0.94)).current;
+  const ring1Opacity = useRef(new Animated.Value(1)).current;
+  const ring2Scale = useRef(new Animated.Value(0.94)).current;
+  const ring2Opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    ring1Scale.value = withRepeat(withTiming(1.06, { duration: 2000 }), -1, true);
-    ring1Opacity.value = withRepeat(withTiming(0, { duration: 2000 }), -1, false);
-    ring2Scale.value = withDelay(600, withRepeat(withTiming(1.06, { duration: 2000 }), -1, true));
-    ring2Opacity.value = withDelay(600, withRepeat(withTiming(0, { duration: 2000 }), -1, false));
-  }, []);
+    const pulse = (scale: Animated.Value, opacity: Animated.Value, delay: number) =>
+      Animated.loop(
+        Animated.parallel([
+          Animated.sequence([
+            Animated.delay(delay),
+            Animated.timing(scale, { toValue: 1.08, duration: 2000, useNativeDriver: true }),
+            Animated.timing(scale, { toValue: 0.94, duration: 0, useNativeDriver: true }),
+          ]),
+          Animated.sequence([
+            Animated.delay(delay),
+            Animated.timing(opacity, { toValue: 0, duration: 2000, useNativeDriver: true }),
+            Animated.timing(opacity, { toValue: 1, duration: 0, useNativeDriver: true }),
+          ]),
+        ])
+      );
 
-  const ring1Style = useAnimatedStyle(() => ({
-    transform: [{ scale: ring1Scale.value }],
-    opacity: ring1Opacity.value,
-  }));
-  const ring2Style = useAnimatedStyle(() => ({
-    transform: [{ scale: ring2Scale.value }],
-    opacity: ring2Opacity.value,
-  }));
+    const anim1 = pulse(ring1Scale, ring1Opacity, 0);
+    const anim2 = pulse(ring2Scale, ring2Opacity, 600);
+    anim1.start();
+    anim2.start();
+    return () => { anim1.stop(); anim2.stop(); };
+  }, []);
 
   return (
     <View style={styles.wrap}>
-      {/* Pulse ring 1 */}
-      <Animated.View style={[styles.ring1, ring1Style]} pointerEvents="none" />
-      {/* Pulse ring 2 */}
-      <Animated.View style={[styles.ring2, ring2Style]} pointerEvents="none" />
-      {/* Button */}
+      <Animated.View
+        style={[styles.ring1, { transform: [{ scale: ring1Scale }], opacity: ring1Opacity }]}
+        pointerEvents="none"
+      />
+      <Animated.View
+        style={[styles.ring2, { transform: [{ scale: ring2Scale }], opacity: ring2Opacity }]}
+        pointerEvents="none"
+      />
       <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
         <View style={styles.btn}>
           <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">

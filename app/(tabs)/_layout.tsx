@@ -49,27 +49,39 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.navWrap, { paddingBottom: insets.bottom > 0 ? insets.bottom - 8 : 8 }]}>
-      <View style={styles.navCard}>
-        {state.routes.map((route, idx) => {
-          const active = state.index === idx;
-          const tab = TABS[idx];
-          const Icon = tab.Icon;
-          return (
-            <TouchableOpacity
-              key={route.key}
-              onPress={() => navigation.navigate(route.name)}
-              style={styles.navItem}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.navIcon, active && styles.navIconActive]}>
-                <Icon active={active} />
-              </View>
-              <Text style={[styles.navLbl, active && styles.navLblActive]}>
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+      <View style={{ borderRadius: 22 }}>
+        {/* White light shadow */}
+        <View style={[StyleSheet.absoluteFillObject, {
+          borderRadius: 22,
+          backgroundColor: T.base,
+          shadowColor: '#FFFFFF',
+          shadowOffset: { width: -4, height: -4 },
+          shadowOpacity: 0.9,
+          shadowRadius: 10,
+        }]} pointerEvents="none" />
+        {/* Dark shadow card */}
+        <View style={styles.navCard}>
+          {state.routes.map((route, idx) => {
+            const active = state.index === idx;
+            const tab = TABS[idx];
+            const Icon = tab.Icon;
+            return (
+              <TouchableOpacity
+                key={route.key}
+                onPress={() => navigation.navigate(route.name)}
+                style={styles.navItem}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.navIcon, active && styles.navIconActive]}>
+                  <Icon active={active} />
+                </View>
+                <Text style={[styles.navLbl, active && styles.navLblActive]}>
+                  {tab.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
     </View>
   );
@@ -100,9 +112,9 @@ const styles = StyleSheet.create({
   navItem: { flex: 1, alignItems: 'center', gap: 5 },
   navIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   navIconActive: {
-    backgroundColor: '#D8E0ED',
-    borderWidth: 1, borderTopColor: 'rgba(163,177,198,0.5)', borderLeftColor: 'rgba(163,177,198,0.5)',
-    borderBottomColor: 'rgba(255,255,255,0.8)', borderRightColor: 'rgba(255,255,255,0.8)',
+    backgroundColor: '#D1D9E6',
+    borderWidth: 1, borderTopColor: 'rgba(163,177,198,0.6)', borderLeftColor: 'rgba(163,177,198,0.6)',
+    borderBottomColor: 'rgba(255,255,255,0.85)', borderRightColor: 'rgba(255,255,255,0.85)',
   },
   navLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 0.6, color: T.textS, fontFamily: 'Syne_700Bold' },
   navLblActive: { color: T.orange },
