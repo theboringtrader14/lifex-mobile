@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
@@ -7,9 +7,52 @@ import { SectionLabel } from '../../components/ui/SectionLabel';
 import { StatBadge } from '../../components/ui/StatBadge';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getSystemStats, getOrders, getAlgos } from '../../src/services/api';
 
 export default function TradingScreen() {
   const insets = useSafeAreaInsets();
+
+  const [stats, setStats] = useState<any>(null);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [algos, setAlgos] = useState<any[]>([]);
+
+  useEffect(() => {
+    getSystemStats().then(setStats).catch(() => {});
+    getOrders().then(d => setOrders(Array.isArray(d) ? d : d?.items ?? [])).catch(() => {});
+    getAlgos().then(d => setAlgos(Array.isArray(d) ? d : d?.items ?? [])).catch(() => {});
+  }, []);
+
+  const formatPnl = (val: number | undefined) => {
+    if (val === undefined || val === null) return '...';
+    const sign = val >= 0 ? '+' : '';
+    if (Math.abs(val) >= 100000) return `${sign}₹${(val / 100000).toFixed(1)}L`;
+    if (Math.abs(val) >= 1000) return `${sign}₹${(val / 1000).toFixed(1)}K`;
+    return `${sign}₹${Math.round(val)}`;
+  };
+  const formatDate = (iso: string) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+  };
+
+  const activeCount = algos.filter(a => a.status === 'active').length;
+  const waitingCount = algos.filter(a => a.status === 'waiting' || a.status === 'paused').length;
+  const errorCount = algos.filter(a => a.status === 'error').length;
+
+  const algoRows = [
+    { dot: T.green, label: 'Active', count: algos.length > 0 ? String(activeCount) : (stats?.active_algos != null ? String(stats.active_algos) : '...'), countColor: T.green },
+    { dot: T.textS, label: 'Waiting', count: algos.length > 0 ? String(waitingCount) : '...', countColor: T.textH },
+    { dot: T.red, label: 'Error', count: algos.length > 0 ? String(errorCount) : '...', countColor: T.red },
+  ];
+
+  const tradeRows = orders.slice(0, 5).map(o => ({
+    name: o.algo_name ?? o.algo_id ?? 'Unknown',
+    type: `${o.symbol ?? 'NIFTY'} · ${o.order_type ?? 'Intraday'}`,
+    pnl: formatPnl(o.pnl ?? o.realized_pnl),
+    date: formatDate(o.fill_time ?? o.created_at ?? ''),
+    pnlColor: (o.pnl ?? o.realized_pnl ?? 0) >= 0 ? T.green : T.red,
+  }));
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       {/* Header */}
@@ -25,29 +68,27 @@ export default function TradingScreen() {
       </View>
 
       {/* Hero P&L */}
-      <View style={s.hero}>
-        <Text style={s.heroLbl}>FY P&L</Text>
-        <Text style={s.heroVal}>+₹294.75</Text>
-        <Text style={s.heroRoi}>▲ 0.02% ROI</Text>
+      <View style={s.heroOuter}>
+        <View style={s.heroInner}>
+          <Text style={s.heroLbl}>FY P&L</Text>
+          <Text style={s.heroVal}>{stats ? formatPnl(stats.fy_pnl) : '...'}</Text>
+          <Text style={s.heroRoi}>▲ 0.02% ROI</Text>
+        </View>
       </View>
 
       {/* Mini cards */}
       <View style={s.twoCol}>
-        {[{ lbl: 'TODAY', val: '+₹0' }, { lbl: 'THIS WEEK', val: '+₹0' }].map((c) => (
-          <NeuCard key={c.lbl} style={{ flex: 1 }} borderRadius={20} padding={14}>
+        {[{ lbl: 'TODAY', val: stats ? formatPnl(stats.today_pnl) : '...' }, { lbl: 'THIS WEEK', val: stats ? formatPnl(stats.week_pnl) : '...' }].map((c) => (
+          <View key={c.lbl} style={s.miniCard}>
             <Text style={s.miniLbl}>{c.lbl}</Text>
             <Text style={s.miniVal}>{c.val}</Text>
-          </NeuCard>
+          </View>
         ))}
       </View>
 
       <SectionLabel label="ALGO STATUS" style={{ marginTop: 14 }} />
       <NeuCard style={s.algoCard} borderRadius={20}>
-        {[
-          { dot: T.green, label: 'Active', count: '21', countColor: T.green },
-          { dot: T.textS, label: 'Waiting', count: '3', countColor: T.textH },
-          { dot: T.red, label: 'Error', count: '0', countColor: T.red },
-        ].map((row, i) => (
+        {algoRows.map((row, i) => (
           <React.Fragment key={row.label}>
             {i > 0 && <View style={s.rowDiv} />}
             <View style={s.algoRow}>
@@ -65,10 +106,7 @@ export default function TradingScreen() {
       <Text style={s.emptyText}>No open positions today</Text>
 
       <SectionLabel label="RECENT TRADES" style={{ marginTop: 14 }} />
-      {[
-        { name: 'Algo-2', type: 'NIFTY CE · Intraday', pnl: '+₹2,604', date: 'Mar 30', pnlColor: T.green },
-        { name: 'Test New', type: 'NIFTY CE · Direct', pnl: '+₹24', date: 'Mar 30', pnlColor: T.green },
-      ].map((t) => (
+      {tradeRows.length > 0 ? tradeRows.map((t) => (
         <NeuCard key={t.name} style={s.tradeCard} borderRadius={20} padding={0}>
           <View style={s.tradeRow}>
             <View>
@@ -81,7 +119,8 @@ export default function TradingScreen() {
             </View>
           </View>
         </NeuCard>
-      ))}
+      )) : null}
+      {tradeRows.length === 0 && <Text style={s.emptyText}>No trades yet</Text>}
     </ScrollView>
   );
 }
@@ -91,12 +130,25 @@ const s = StyleSheet.create({
   backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backTxt: { fontSize: 13, fontWeight: '600', color: T.textB, fontFamily: 'Syne_700Bold' },
   title: { fontSize: 15, fontWeight: '700', color: T.textH, letterSpacing: 0.5, textTransform: 'uppercase', fontFamily: 'Syne_700Bold' },
-  hero: { alignItems: 'center', paddingHorizontal: 24, paddingVertical: 16, paddingBottom: 12 },
+  heroOuter: { marginHorizontal: 16 },
+  heroInner: { alignItems: 'center', paddingVertical: 20, paddingHorizontal: 16 },
   heroLbl: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold' },
   heroVal: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 36, fontWeight: '700', color: T.green, letterSpacing: -1 },
   heroRoi: { fontSize: 12, color: T.textM, marginTop: 4, fontFamily: 'Syne_400Regular' },
   twoCol: { flexDirection: 'row', gap: 10, paddingHorizontal: 16 },
-  miniLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 0.9, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold' },
+  miniCard: {
+    flex: 1,
+    borderRadius: 20,
+    backgroundColor: '#E8EEF6',
+    padding: 14,
+    shadowColor: '#8FA3BC',
+    shadowOffset: { width: 6, height: 6 },
+    shadowOpacity: 0.8,
+    shadowRadius: 14,
+    elevation: 8,
+    boxShadow: '8px 8px 18px rgba(143,163,188,0.8), -6px -6px 14px rgba(255,255,255,1)',
+  },
+  miniLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 0.9, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold' , paddingLeft: 2 },
   miniVal: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 20, fontWeight: '600', color: T.textH },
   algoCard: { marginHorizontal: 16 },
   algoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 },

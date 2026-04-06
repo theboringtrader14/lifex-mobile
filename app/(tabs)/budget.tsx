@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
@@ -7,6 +7,7 @@ import { NeuInset } from '../../components/ui/NeuInset';
 import { SectionLabel } from '../../components/ui/SectionLabel';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getBudgetSummary } from '../../src/services/api';
 
 const CATS = [
   { name: 'Food', pct: 23, color: T.teal, amt: '₹4,200' },
@@ -24,6 +25,20 @@ const EXPENSES = [
 
 export default function BudgetScreen() {
   const insets = useSafeAreaInsets();
+
+  const [budgetData, setBudgetData] = useState<any>(null);
+
+  useEffect(() => {
+    getBudgetSummary().then(setBudgetData).catch(() => {});
+  }, []);
+
+  const formatValue = (val: number | undefined) => {
+    if (val === undefined || val === null) return '...';
+    if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+    if (val >= 1000) return `₹${(val / 1000).toFixed(1)}K`;
+    return `₹${Math.round(val)}`;
+  };
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View style={s.hdr}>
@@ -39,14 +54,14 @@ export default function BudgetScreen() {
 
       <View style={s.hero}>
         <Text style={s.heroLbl}>THIS MONTH</Text>
-        <Text style={s.heroVal}>₹18,400</Text>
-        <Text style={s.heroBudget}>of ₹30,000 budget</Text>
+        <Text style={s.heroVal}>{budgetData ? formatValue(budgetData.monthly_total) : '...'}</Text>
+        <Text style={s.heroBudget}>of {budgetData ? formatValue(budgetData.monthly_budget ?? 30000) : '₹30,000'} budget</Text>
       </View>
 
       {/* Progress bar */}
       <View style={s.progressWrap}>
         <NeuInset style={s.progressTrack} borderRadius={8}>
-          <View style={[s.progressFill, { width: '61.3%' }]} />
+          <View style={[s.progressFill, { width: `${budgetData ? Math.min(100, Math.round((budgetData.monthly_total / (budgetData.monthly_budget ?? 30000)) * 100)) : 61}%` }]} />
         </NeuInset>
       </View>
 
@@ -85,9 +100,7 @@ export default function BudgetScreen() {
       ))}
 
       <TouchableOpacity activeOpacity={0.85}>
-        <NeuCard style={s.addBtn} borderRadius={20} overflow="visible">
-          <Text style={s.addBtnTxt}>⊕  Add Expense</Text>
-        </NeuCard>
+        
       </TouchableOpacity>
     </ScrollView>
   );
@@ -103,13 +116,27 @@ const s = StyleSheet.create({
   heroVal: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 32, fontWeight: '700', color: T.textH, letterSpacing: -1 },
   heroBudget: { fontSize: 12, color: T.textM, marginTop: 4, fontFamily: 'Syne_400Regular' },
   progressWrap: { marginHorizontal: 16, marginTop: 10 },
-  progressTrack: { height: 10, borderRadius: 8, overflow: 'hidden' },
+  progressTrack: {
+    height: 10, borderRadius: 8, overflow: 'hidden',
+    backgroundColor: '#D1DCE8',
+    borderTopWidth: 1.5, borderLeftWidth: 1.5,
+    borderTopColor: 'rgba(143,163,188,0.9)', borderLeftColor: 'rgba(143,163,188,0.9)',
+    borderBottomWidth: 1.5, borderRightWidth: 1.5,
+    borderBottomColor: 'rgba(255,255,255,1)', borderRightColor: 'rgba(255,255,255,1)',
+  },
   progressFill: { height: '100%', borderRadius: 8, backgroundColor: T.purple },
   catCard: { marginHorizontal: 16 },
   catRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 24, paddingVertical: 8 },
   catName: { fontSize: 12, color: T.textB, fontWeight: '500', width: 56, fontFamily: 'Syne_400Regular' },
   catBarWrap: { flex: 1 },
-  catTrack: { height: 8, borderRadius: 6, overflow: 'hidden' },
+  catTrack: {
+    height: 8, borderRadius: 6, overflow: 'hidden',
+    backgroundColor: '#D1DCE8',
+    borderTopWidth: 1, borderLeftWidth: 1,
+    borderTopColor: 'rgba(143,163,188,0.8)', borderLeftColor: 'rgba(143,163,188,0.8)',
+    borderBottomWidth: 1, borderRightWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,1)', borderRightColor: 'rgba(255,255,255,1)',
+  },
   catFill: { height: '100%', borderRadius: 6 },
   catPct: { fontFamily: 'JetBrainsMono_400Regular', fontSize: 11, color: T.textM, width: 28, textAlign: 'right' },
   catAmt: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 11, fontWeight: '600', color: T.textH, width: 44, textAlign: 'right' },

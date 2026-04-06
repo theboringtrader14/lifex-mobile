@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
@@ -8,6 +8,7 @@ import { SectionLabel } from '../../components/ui/SectionLabel';
 import { MicButton } from '../../components/ui/MicButton';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getHomeDashboard, getPortfolioSummary, getBudgetSummary } from '../../src/services/api';
 
 const { width } = Dimensions.get('window');
 
@@ -19,13 +20,7 @@ function ArrowIcon() {
   );
 }
 
-const WIDGETS = [
-  { color: T.teal, label: 'NET WORTH', value: '₹47.1L', sub: '+0.5% today', subColor: T.teal, route: '/portfolio' },
-  { color: T.orange, label: 'TRADING', value: '+₹294', sub: 'FY P&L', subColor: T.textM, route: '/trading' },
-  { color: T.purple, label: 'BUDGET', value: '₹18.4K', sub: 'this month', subColor: T.textM, route: '/budget' },
-];
-
-function WidgetCard({ w }: { w: typeof WIDGETS[0] }) {
+function WidgetCard({ w }: { w: { color: string; label: string; value: string; sub: string; subColor: string; route: string } }) {
   const [pressed, setPressed] = React.useState(false);
   return (
     <Pressable
@@ -52,6 +47,38 @@ function WidgetCard({ w }: { w: typeof WIDGETS[0] }) {
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+
+  const [dashboard, setDashboard] = useState<any>(null);
+  const [portfolioSummary, setPortfolioSummary] = useState<any>(null);
+  const [budgetSummary, setBudgetSummary] = useState<any>(null);
+
+  useEffect(() => {
+    getHomeDashboard().then(setDashboard).catch(() => {});
+    getPortfolioSummary().then(setPortfolioSummary).catch(() => {});
+    getBudgetSummary().then(setBudgetSummary).catch(() => {});
+  }, []);
+
+  const formatPnl = (val: number | undefined) => {
+    if (val === undefined || val === null) return '...';
+    const sign = val >= 0 ? '+' : '';
+    if (Math.abs(val) >= 100000) return `${sign}₹${(val / 100000).toFixed(1)}L`;
+    if (Math.abs(val) >= 1000) return `${sign}₹${(val / 1000).toFixed(1)}K`;
+    return `${sign}₹${Math.round(val)}`;
+  };
+  const formatValue = (val: number | undefined) => {
+    if (val === undefined || val === null) return '...';
+    if (val >= 10000000) return `₹${(val / 10000000).toFixed(1)}Cr`;
+    if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+    if (val >= 1000) return `₹${(val / 1000).toFixed(1)}K`;
+    return `₹${Math.round(val)}`;
+  };
+
+  const widgets = [
+    { color: T.teal, label: 'NET WORTH', value: formatValue(portfolioSummary?.total_value), sub: '+0.5% today', subColor: T.teal, route: '/portfolio' },
+    { color: T.orange, label: 'TRADING', value: formatPnl(dashboard?.fy_pnl), sub: 'FY P&L', subColor: T.textM, route: '/trading' },
+    { color: T.purple, label: 'BUDGET', value: formatValue(budgetSummary?.monthly_total), sub: 'this month', subColor: T.textM, route: '/budget' },
+  ];
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: T.base }}
@@ -73,42 +100,40 @@ export default function HomeScreen() {
 
       {/* Widget cards */}
       <View style={s.widgetRow}>
-        {WIDGETS.map((w) => <WidgetCard key={w.label} w={w} />)}
+        {widgets.map((w) => <WidgetCard key={w.label} w={w} />)}
       </View>
 
       {/* Stats strip */}
       <NeuCard style={{ marginHorizontal: 16, marginTop: 14 }} borderRadius={20} overflow="hidden">
         <View style={{ flexDirection: 'row', paddingVertical: 16 }}>
           <View style={s.statItem}>
-            <Text style={[s.statNum, { color: T.textH }]}>21</Text>
+            <Text style={[s.statNum, { color: T.textH }]}>{dashboard?.active_algos ?? '...'}</Text>
             <Text style={s.statLbl}>ACTIVE ALGOS</Text>
           </View>
-          <View style={{ width: 1, backgroundColor: 'rgba(163,177,198,0.4)', marginVertical: '12%' }} />
+          <View style={{ width: 1, backgroundColor: 'rgba(163,177,198,0.45)', marginVertical: 14 }} />
           <View style={s.statItem}>
-            <Text style={[s.statNum, { color: T.textH }]}>0</Text>
+            <Text style={[s.statNum, { color: T.textH }]}>{dashboard?.open_positions ?? '...'}</Text>
             <Text style={s.statLbl}>OPEN POS.</Text>
           </View>
-          <View style={{ width: 1, backgroundColor: 'rgba(163,177,198,0.4)', marginVertical: '12%' }} />
+          <View style={{ width: 1, backgroundColor: 'rgba(163,177,198,0.45)', marginVertical: 14 }} />
           <View style={s.statItem}>
-            <Text style={[s.statNum, { color: T.teal }]}>₹0</Text>
+            <Text style={[s.statNum, { color: T.teal }]}>{dashboard ? formatPnl(dashboard.today_pnl) : '...'}</Text>
             <Text style={s.statLbl}>TODAY P&L</Text>
           </View>
         </View>
       </NeuCard>
 
-      <SectionLabel label="ADD EXPENSE" style={{ marginTop: 14 }} />
+      <SectionLabel label="LIFEX AI" style={{ marginTop: 14 }} />
 
       {/* Voice section */}
       <View style={s.voiceWrap}>
-        <View style={s.voiceBoxOuter}>
-          <NeuInset style={s.voiceBox}>
-            <Text style={s.voiceHint}>SAY YOUR EXPENSE…</Text>
-            <Text style={s.voiceText}>e.g. "Swiggy 350 food"</Text>
-          </NeuInset>
-          {/* Mic button absolutely anchored at bottom of voice box, overhanging by 33px */}
-          <View style={s.micAnchor}>
-            <MicButton onPress={() => {}} listening />
-          </View>
+        <NeuInset style={s.voiceBox} borderRadius={24} overflow="visible">
+          <Text style={s.voiceHint}>SAY YOUR EXPENSE…</Text>
+          <Text style={s.voiceText}>e.g. "Swiggy 350 food"</Text>
+        </NeuInset>
+        {/* Mic — half overlaps bottom of container */}
+        <View style={s.micAnchor}>
+          <MicButton onPress={() => {}} listening />
         </View>
         <Text style={s.tapHint}>TAP MIC TO RECORD EXPENSE</Text>
       </View>
@@ -142,11 +167,10 @@ const s = StyleSheet.create({
   statItem: { flex: 1, alignItems: 'center' },
   statNum: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 20, fontWeight: '600', marginBottom: 4 },
   statLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', color: T.textS, fontFamily: 'Syne_700Bold' },
-  voiceWrap: { paddingHorizontal: 16, alignItems: 'center' },
-  voiceBoxOuter: { width: '100%', position: 'relative', marginBottom: 30 },
-  voiceBox: { width: '100%', paddingTop: 18, paddingHorizontal: 20, paddingBottom: 64, minHeight: 130 },
+  voiceWrap: { paddingHorizontal: 16, alignItems: 'center', marginBottom: 16 },
+  voiceBox: { width: '100%', padding: 20, paddingBottom: 60, minHeight: 220 },
+  micAnchor: { marginTop: -38, zIndex: 10 },
   voiceHint: { fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: T.textS, marginBottom: 10, fontFamily: 'Syne_700Bold' },
   voiceText: { fontSize: 14, color: T.textB, lineHeight: 22, fontStyle: 'italic', fontFamily: 'Syne_400Regular' },
-  micAnchor: { position: 'absolute', bottom: -30, left: 0, right: 0, alignItems: 'center' },
-  tapHint: { marginTop: 40, fontSize: 10, color: T.textS, letterSpacing: 0.8, textTransform: 'uppercase', fontWeight: '700', fontFamily: 'Syne_700Bold' },
+  tapHint: { marginTop: 18, fontSize: 10, color: T.textS, letterSpacing: 0.8, textTransform: 'uppercase', fontWeight: '700', fontFamily: 'Syne_700Bold' },
 });

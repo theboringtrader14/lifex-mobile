@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
@@ -7,12 +7,30 @@ import { NeuInset } from '../../components/ui/NeuInset';
 import { SectionLabel } from '../../components/ui/SectionLabel';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getPortfolio, getPortfolioSummary } from '../../src/services/api';
 
 const CHART_PATH = 'M0 90 C20 85 40 80 70 75 S110 65 140 55 S190 35 230 28 S290 20 340 10 L340 110 L0 110 Z';
 const CHART_LINE = 'M0 90 C20 85 40 80 70 75 S110 65 140 55 S190 35 230 28 S290 20 340 10';
 
 export default function PortfolioScreen() {
   const insets = useSafeAreaInsets();
+
+  const [summary, setSummary] = useState<any>(null);
+  const [holdings, setHoldings] = useState<any[]>([]);
+
+  useEffect(() => {
+    getPortfolioSummary().then(setSummary).catch(() => {});
+    getPortfolio().then(d => setHoldings(Array.isArray(d) ? d : d?.holdings ?? [])).catch(() => {});
+  }, []);
+
+  const formatValue = (val: number | undefined) => {
+    if (val === undefined || val === null) return '...';
+    if (val >= 10000000) return `₹${(val / 10000000).toFixed(1)}Cr`;
+    if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+    if (val >= 1000) return `₹${(val / 1000).toFixed(1)}K`;
+    return `₹${Math.round(val)}`;
+  };
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View style={s.hdr}>
@@ -28,8 +46,8 @@ export default function PortfolioScreen() {
 
       <View style={s.hero}>
         <Text style={s.heroLbl}>TOTAL</Text>
-        <Text style={s.heroVal}>₹47,08,000</Text>
-        <Text style={s.heroGain}>+₹7,27,586 · +18.2% overall</Text>
+        <Text style={s.heroVal}>{summary ? formatValue(summary.total_value) : '...'}</Text>
+        <Text style={s.heroGain}>{summary ? `▲ ${summary.total_gain_pct?.toFixed(2) ?? '0.00'}% overall` : '▲ ...'}</Text>
       </View>
 
       {/* Equity curve */}
@@ -96,7 +114,15 @@ const s = StyleSheet.create({
   heroLbl: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold' },
   heroVal: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 32, fontWeight: '700', color: T.textH, letterSpacing: -1 },
   heroGain: { fontSize: 13, color: T.green, fontWeight: '600', marginTop: 4, fontFamily: 'Syne_700Bold' },
-  chartBox: { marginHorizontal: 16, borderRadius: 20, overflow: 'hidden', height: 90, padding: 8, paddingHorizontal: 12, paddingBottom: 4 },
+  chartBox: {
+    marginHorizontal: 16, borderRadius: 20, overflow: 'hidden',
+    height: 90, padding: 8, paddingHorizontal: 12, paddingBottom: 4,
+    backgroundColor: '#D1DCE8',
+    borderTopWidth: 2, borderLeftWidth: 2,
+    borderTopColor: 'rgba(143,163,188,0.9)', borderLeftColor: 'rgba(143,163,188,0.9)',
+    borderBottomWidth: 2, borderRightWidth: 2,
+    borderBottomColor: 'rgba(255,255,255,1)', borderRightColor: 'rgba(255,255,255,1)',
+  },
   assetCard: { marginHorizontal: 16, marginBottom: 10 },
   assetRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14, paddingHorizontal: 16 },
   assetLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },

@@ -1,0 +1,36 @@
+import axios from 'axios';
+import { STAAX_URL, INVEX_URL, BUDGEX_URL } from '../config';
+
+const STAAX = axios.create({ baseURL: STAAX_URL });
+const INVEX = axios.create({ baseURL: INVEX_URL });
+const BUDGEX = axios.create({ baseURL: BUDGEX_URL });
+
+export const getHomeDashboard = () =>
+  STAAX.get('/api/v1/mobile/dashboard').then(r => r.data);
+
+export const getSystemStats = () =>
+  STAAX.get('/api/v1/system/stats').then(r => r.data);
+
+export const getSystemHealth = () =>
+  STAAX.get('/api/v1/system/health').then(r => r.data);
+
+export const getOrders = (date?: string) =>
+  STAAX.get('/api/v1/orders/', { params: { trading_date: date, limit: 10 } }).then(r => r.data);
+
+export const getAlgos = () =>
+  STAAX.get('/api/v1/algos/', { params: { limit: 50 } }).then(r => r.data);
+
+export const getPortfolio = () =>
+  INVEX.get('/api/v1/portfolio/holdings').then(r => r.data);
+
+export const getPortfolioSummary = () =>
+  INVEX.get('/api/v1/portfolio/summary').then(r => r.data);
+
+export const getBudgetSummary = () =>
+  BUDGEX.get('/api/v1/expenses/summary').then(r => r.data);
+
+export const analyzeAI = (message: string) =>
+  STAAX.post('/api/v1/ai/analyze', { message, context: {} }).then(r => r.data);
+
+export const chatAI = (message: string) =>
+  STAAX.post('/api/v1/ai/chat', { message, context: {} }).then(r => r.data);

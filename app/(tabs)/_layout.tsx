@@ -1,10 +1,12 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Svg, { Path, Polyline, Circle, Rect, Line } from 'react-native-svg';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+const isWeb = typeof document !== 'undefined';
 
 // SVG icons
 const HomeIcon = ({ active }: { active: boolean }) => (
@@ -49,17 +51,9 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.navWrap, { paddingBottom: insets.bottom > 0 ? insets.bottom - 8 : 8 }]}>
-      <View style={{ borderRadius: 22 }}>
-        {/* White light shadow */}
-        <View style={[StyleSheet.absoluteFillObject, {
-          borderRadius: 22,
-          backgroundColor: T.base,
-          shadowColor: '#FFFFFF',
-          shadowOffset: { width: -4, height: -4 },
-          shadowOpacity: 0.9,
-          shadowRadius: 10,
-        }]} pointerEvents="none" />
-        {/* Dark shadow card */}
+      {/* Outer — dark bottom shadow */}
+      <View style={[styles.navOuter, isWeb && { boxShadow: '0px 8px 20px rgba(143,163,188,0.7)' }]}>
+        {/* Inner — white top highlight border */}
         <View style={styles.navCard}>
           {state.routes.map((route, idx) => {
             const active = state.index === idx;
@@ -72,9 +66,23 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 style={styles.navItem}
                 activeOpacity={0.7}
               >
-                <View style={[styles.navIcon, active && styles.navIconActive]}>
-                  <Icon active={active} />
-                </View>
+                {active ? (
+                  <View style={[styles.navIcon, {
+                    backgroundColor: '#C8D4E0',
+                    borderTopWidth: 2, borderLeftWidth: 2,
+                    borderTopColor: 'rgba(143,163,188,0.8)',
+                    borderLeftColor: 'rgba(143,163,188,0.8)',
+                    borderBottomWidth: 2, borderRightWidth: 2,
+                    borderBottomColor: 'rgba(255,255,255,0.95)',
+                    borderRightColor: 'rgba(255,255,255,0.95)',
+                  }]}>
+                    <Icon active={active} />
+                  </View>
+                ) : (
+                  <View style={styles.navIcon}>
+                    <Icon active={active} />
+                  </View>
+                )}
                 <Text style={[styles.navLbl, active && styles.navLblActive]}>
                   {tab.label}
                 </Text>
@@ -100,22 +108,31 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  navWrap: {
-    backgroundColor: T.base, paddingHorizontal: 16, paddingTop: 8,
+  navWrap: { backgroundColor: '#E8EEF6', paddingHorizontal: 16, paddingTop: 0, paddingBottom: 0 },
+  navOuter: {
+    borderRadius: 28,
+    backgroundColor: '#E8EEF6',
+    shadowColor: '#8FA3BC',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 14,
   },
   navCard: {
-    flexDirection: 'row', borderRadius: 22, backgroundColor: T.base,
-    paddingVertical: 12, paddingHorizontal: 8,
-    shadowColor: '#A3B1C6', shadowOffset: { width: 6, height: 6 },
-    shadowOpacity: 0.75, shadowRadius: 14, elevation: 8,
+    flexDirection: 'row',
+    borderRadius: 28,
+    backgroundColor: '#E8EEF6',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderTopWidth: 2,
+    borderTopColor: 'rgba(255,255,255,1)',
+    borderLeftWidth: 1,
+    borderLeftColor: 'rgba(255,255,255,0.7)',
+    borderBottomWidth: 0,
+    borderRightWidth: 0,
   },
   navItem: { flex: 1, alignItems: 'center', gap: 5 },
-  navIcon: { width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  navIconActive: {
-    backgroundColor: '#D1D9E6',
-    borderWidth: 1, borderTopColor: 'rgba(163,177,198,0.6)', borderLeftColor: 'rgba(163,177,198,0.6)',
-    borderBottomColor: 'rgba(255,255,255,0.85)', borderRightColor: 'rgba(255,255,255,0.85)',
-  },
+  navIcon: { width: 36, height: 36, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   navLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 0.6, color: T.textS, fontFamily: 'Syne_700Bold' },
   navLblActive: { color: T.orange },
 });

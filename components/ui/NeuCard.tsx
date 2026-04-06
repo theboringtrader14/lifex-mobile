@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, Platform } from 'react-native';
+import { View, ViewStyle, Platform } from 'react-native';
 import { T } from '../../theme';
+import { NEU_RAISED } from '../../constants/Shadows';
 
 interface Props {
   children: React.ReactNode;
@@ -13,17 +14,19 @@ interface Props {
 
 export function NeuCard({ children, style, borderRadius = 20, padding, overflow = 'hidden', pressed = false }: Props) {
   if (pressed) {
-    // Inset style when pressed
     return (
       <View style={[{
         borderRadius,
-        backgroundColor: '#D1D9E6',
+        backgroundColor: '#D1DCE8',
         overflow: 'hidden',
-        borderWidth: 1.5,
-        borderTopColor: 'rgba(163,177,198,0.55)',
-        borderLeftColor: 'rgba(163,177,198,0.55)',
-        borderBottomColor: 'rgba(255,255,255,0.85)',
-        borderRightColor: 'rgba(255,255,255,0.85)',
+        borderTopWidth: 2,
+        borderLeftWidth: 2,
+        borderTopColor: 'rgba(143,163,188,0.9)',
+        borderLeftColor: 'rgba(143,163,188,0.9)',
+        borderBottomWidth: 2,
+        borderRightWidth: 2,
+        borderBottomColor: 'rgba(255,255,255,1)',
+        borderRightColor: 'rgba(255,255,255,1)',
       }, style]}>
         <View style={{
           borderRadius: borderRadius > 1 ? borderRadius - 1 : borderRadius,
@@ -36,39 +39,28 @@ export function NeuCard({ children, style, borderRadius = 20, padding, overflow 
     );
   }
 
+  const webShadow: any = Platform.OS === 'web'
+    ? { boxShadow: '8px 8px 18px rgba(143,163,188,0.8), -3px -3px 8px rgba(255,255,255,0.7)' }
+    : {};
+
   return (
-    <View style={[{ borderRadius }, style]}>
-      {/* Light shadow layer — top-left (visible on iOS) */}
-      <View style={[StyleSheet.absoluteFillObject, {
-        borderRadius,
-        backgroundColor: T.base,
-        shadowColor: '#FFFFFF',
-        shadowOffset: { width: -5, height: -5 },
-        shadowOpacity: 0.9,
-        shadowRadius: 12,
-      }]} pointerEvents="none" />
-      {/* Dark shadow layer — bottom-right, carries border for Android light highlight */}
+    <View style={[{
+      borderRadius,
+      backgroundColor: T.base,
+      ...NEU_RAISED,
+      ...webShadow,
+    }, style]}>
       <View style={{
-        borderRadius,
-        backgroundColor: T.base,
-        shadowColor: '#A3B1C6',
-        shadowOffset: { width: 6, height: 6 },
-        shadowOpacity: 0.75,
-        shadowRadius: 14,
-        elevation: 6,
-        borderWidth: 1,
-        borderTopColor: 'rgba(255,255,255,0.85)',
-        borderLeftColor: 'rgba(255,255,255,0.85)',
-        borderBottomColor: 'rgba(163,177,198,0.18)',
-        borderRightColor: 'rgba(163,177,198,0.18)',
+        borderRadius: borderRadius > 1 ? borderRadius - 1 : borderRadius,
+        borderTopWidth: 1.5,
+        borderTopColor: 'rgba(255,255,255,1)',
+        borderLeftWidth: 0,
+        borderBottomWidth: 0,
+        borderRightWidth: 0,
+        overflow,
+        ...(padding !== undefined ? { padding } : {}),
       }}>
-        <View style={{
-          borderRadius: borderRadius > 1 ? borderRadius - 1 : borderRadius,
-          overflow,
-          ...(padding !== undefined ? { padding } : {}),
-        }}>
-          {children}
-        </View>
+        {children}
       </View>
     </View>
   );

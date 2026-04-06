@@ -1,58 +1,72 @@
 import React, { useEffect, useRef } from 'react';
-import { View, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Animated, Platform } from 'react-native';
 import Svg, { Rect, Path, Line } from 'react-native-svg';
 import { T } from '../../theme';
+import { NEU_RAISED_SM } from '../../constants/Shadows';
 
 interface Props { onPress: () => void; listening?: boolean }
 
 export function MicButton({ onPress, listening = false }: Props) {
-  const ring1Scale = useRef(new Animated.Value(0.94)).current;
-  const ring1Opacity = useRef(new Animated.Value(1)).current;
-  const ring2Scale = useRef(new Animated.Value(0.94)).current;
-  const ring2Opacity = useRef(new Animated.Value(1)).current;
+  const ring1Scale = useRef(new Animated.Value(1)).current;
+  const ring1Opacity = useRef(new Animated.Value(0.8)).current;
+  const ring2Scale = useRef(new Animated.Value(1)).current;
+  const ring2Opacity = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
-    const pulse = (scale: Animated.Value, opacity: Animated.Value, delay: number) =>
-      Animated.loop(
-        Animated.parallel([
-          Animated.sequence([
-            Animated.delay(delay),
-            Animated.timing(scale, { toValue: 1.08, duration: 2000, useNativeDriver: true }),
-            Animated.timing(scale, { toValue: 0.94, duration: 0, useNativeDriver: true }),
-          ]),
-          Animated.sequence([
-            Animated.delay(delay),
-            Animated.timing(opacity, { toValue: 0, duration: 2000, useNativeDriver: true }),
-            Animated.timing(opacity, { toValue: 1, duration: 0, useNativeDriver: true }),
-          ]),
-        ])
-      );
-
-    const anim1 = pulse(ring1Scale, ring1Opacity, 0);
-    const anim2 = pulse(ring2Scale, ring2Opacity, 600);
-    anim1.start();
-    anim2.start();
-    return () => { anim1.stop(); anim2.stop(); };
+    const pulse1 = Animated.loop(
+      Animated.parallel([
+        Animated.timing(ring1Scale, { toValue: 1.5, duration: 1800, useNativeDriver: true }),
+        Animated.timing(ring1Opacity, { toValue: 0, duration: 1800, useNativeDriver: true }),
+      ])
+    );
+    const pulse2 = Animated.loop(
+      Animated.parallel([
+        Animated.timing(ring2Scale, { toValue: 1.5, duration: 1800, useNativeDriver: true }),
+        Animated.timing(ring2Opacity, { toValue: 0, duration: 1800, useNativeDriver: true }),
+      ])
+    );
+    pulse1.start();
+    const t = setTimeout(() => pulse2.start(), 600);
+    return () => {
+      clearTimeout(t);
+      pulse1.stop();
+      pulse2.stop();
+    };
   }, []);
 
   return (
-    <View style={styles.wrap}>
+    <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
       <Animated.View
-        style={[styles.ring1, { transform: [{ scale: ring1Scale }], opacity: ring1Opacity }]}
         pointerEvents="none"
+        style={{
+          position: 'absolute',
+          width: 90, height: 90, borderRadius: 45,
+          borderWidth: 2, borderColor: 'rgba(255,107,0,0.35)',
+          transform: [{ scale: ring1Scale }],
+          opacity: ring1Opacity,
+        }}
       />
       <Animated.View
-        style={[styles.ring2, { transform: [{ scale: ring2Scale }], opacity: ring2Opacity }]}
         pointerEvents="none"
+        style={{
+          position: 'absolute',
+          width: 110, height: 110, borderRadius: 55,
+          borderWidth: 1.5, borderColor: 'rgba(255,107,0,0.2)',
+          transform: [{ scale: ring2Scale }],
+          opacity: ring2Opacity,
+        }}
       />
       <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
-        <View style={styles.btn}>
-          <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-            <Rect x={9} y={3} width={6} height={11} rx={3} fill={T.orange} />
-            <Path d="M5 11a7 7 0 0014 0" stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
-            <Line x1={12} y1={18} x2={12} y2={21} stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
-            <Line x1={9} y1={21} x2={15} y2={21} stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
-          </Svg>
+        <View style={[styles.btnWrap, Platform.OS === 'web' ? { boxShadow: '7px 7px 16px rgba(143,163,188,0.75), -5px -5px 12px rgba(255,255,255,1)' } as any : {}]}>
+          <View style={[StyleSheet.absoluteFillObject, styles.btnLight]} pointerEvents="none" />
+          <View style={[styles.btn, NEU_RAISED_SM]}>
+            <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+              <Rect x={9} y={3} width={6} height={11} rx={3} fill={T.orange} />
+              <Path d="M5 11a7 7 0 0014 0" stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
+              <Line x1={12} y1={18} x2={12} y2={21} stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
+              <Line x1={9} y1={21} x2={15} y2={21} stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
+            </Svg>
+          </View>
         </View>
       </TouchableOpacity>
     </View>
@@ -60,20 +74,29 @@ export function MicButton({ onPress, listening = false }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { width: 66, height: 66, alignItems: 'center', justifyContent: 'center' },
-  ring1: {
-    position: 'absolute', width: 82, height: 82, borderRadius: 41,
-    borderWidth: 2, borderColor: 'rgba(255,107,0,0.22)',
+  btnWrap: {
+    width: 66, height: 66, borderRadius: 33,
+    backgroundColor: '#E8EEF6',
+    // iOS dark shadow
+    shadowColor: '#8FA3BC',
+    shadowOffset: { width: 7, height: 7 },
+    shadowOpacity: 0.85,
+    shadowRadius: 16,
+    elevation: 10,
   },
-  ring2: {
-    position: 'absolute', width: 100, height: 100, borderRadius: 50,
-    borderWidth: 1.5, borderColor: 'rgba(255,107,0,0.10)',
+  btnLight: {
+    borderRadius: 33,
+    backgroundColor: 'transparent',
+    borderTopWidth: 1.5,
+    borderLeftWidth: 1.5,
+    borderTopColor: 'rgba(255,255,255,1)',
+    borderLeftColor: 'rgba(255,255,255,1)',
+    borderBottomWidth: 0,
+    borderRightWidth: 0,
   },
   btn: {
     width: 66, height: 66, borderRadius: 33,
     backgroundColor: '#E8EEF6',
     alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#A3B1C6', shadowOffset: { width: 6, height: 6 },
-    shadowOpacity: 0.75, shadowRadius: 16, elevation: 8,
   },
 });
