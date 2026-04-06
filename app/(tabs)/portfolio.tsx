@@ -34,12 +34,6 @@ export default function PortfolioScreen() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View style={s.hdr}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
-          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-            <Path d="M15 18l-6-6 6-6" stroke={T.textB} strokeWidth={2} strokeLinecap="round" />
-          </Svg>
-          <Text style={s.backTxt}>Back</Text>
-        </TouchableOpacity>
         <Text style={s.title}>NET WORTH</Text>
         <View style={{ width: 60 }} />
       </View>
@@ -117,18 +111,20 @@ const s = StyleSheet.create({
   chartBox: {
     marginHorizontal: 16, borderRadius: 20, overflow: 'hidden',
     height: 90, padding: 8, paddingHorizontal: 12, paddingBottom: 4,
-    backgroundColor: '#D1DCE8',
-    borderTopWidth: 2, borderLeftWidth: 2,
-    borderTopColor: 'rgba(143,163,188,0.9)', borderLeftColor: 'rgba(143,163,188,0.9)',
-    borderBottomWidth: 2, borderRightWidth: 2,
-    borderBottomColor: 'rgba(255,255,255,1)', borderRightColor: 'rgba(255,255,255,1)',
+    backgroundColor: '#E8EEF6',
+    borderTopWidth: 1, borderLeftWidth: 1,
+    borderTopColor: 'rgba(143,163,188,0.4)', borderLeftColor: 'rgba(143,163,188,0.4)',
+    borderBottomWidth: 0, borderRightWidth: 0,
+    boxShadow: 'inset 5px 5px 14px rgba(143,163,188,0.6), inset -4px -4px 10px rgba(255,255,255,0.95)',
   },
-  assetCard: { marginHorizontal: 16, marginBottom: 10 },
+  assetCard: { marginHorizontal: 16, marginBottom: 14 },
   assetRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14, paddingHorizontal: 16 },
   assetLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   assetIcon: {
     width: 36, height: 36, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: T.base, shadowColor: '#A3B1C6', shadowOffset: { width: 3, height: 3 }, shadowOpacity: 0.75, shadowRadius: 7, elevation: 4,
+    backgroundColor: '#E8EEF6',
+    shadowColor: '#A3B1C6', shadowOffset: { width: 3, height: 3 }, shadowOpacity: 0.6, shadowRadius: 6, elevation: 3,
+    boxShadow: '3px 3px 6px rgba(163,177,198,0.6), -2px -2px 5px rgba(255,255,255,0.92)',
   },
   assetName: { fontSize: 13, fontWeight: '600', color: T.textH, fontFamily: 'Syne_700Bold' },
   assetSub: { fontSize: 10, color: T.textM, marginTop: 2, fontFamily: 'Syne_400Regular' },
@@ -137,6 +133,6 @@ const s = StyleSheet.create({
   rowDiv: { height: 1, backgroundColor: 'rgba(163,177,198,0.25)', marginHorizontal: 0 },
   holdingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 10 },
   holdingTicker: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 13, fontWeight: '600', color: T.textH, flex: 1 },
-  holdingVal: { fontFamily: 'JetBrainsMono_400Regular', fontSize: 12, color: T.textB, flex: 1, textAlign: 'center' },
-  holdingPct: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 12, fontWeight: '600', color: T.green, flex: 1, textAlign: 'right' },
+  holdingVal: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 12, color: T.textB, marginRight: 16 },
+  holdingPct: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 12, fontWeight: '600', color: T.green, width: 60, textAlign: 'right' },
 });

@@ -57,12 +57,6 @@ export default function TradingScreen() {
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={s.hdr}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
-          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-            <Path d="M15 18l-6-6 6-6" stroke={T.textB} strokeWidth={2} strokeLinecap="round" />
-          </Svg>
-          <Text style={s.backTxt}>Back</Text>
-        </TouchableOpacity>
         <Text style={s.title}>TRADING</Text>
         <StatBadge label="PRACTIX" />
       </View>
@@ -135,20 +129,12 @@ const s = StyleSheet.create({
   heroLbl: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold' },
   heroVal: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 36, fontWeight: '700', color: T.green, letterSpacing: -1 },
   heroRoi: { fontSize: 12, color: T.textM, marginTop: 4, fontFamily: 'Syne_400Regular' },
-  twoCol: { flexDirection: 'row', gap: 10, paddingHorizontal: 16 },
+  twoCol: { flexDirection: 'row', gap: 18, paddingHorizontal: 16, marginTop: 6 },
   miniCard: {
-    flex: 1,
-    borderRadius: 20,
-    backgroundColor: '#E8EEF6',
-    padding: 14,
-    shadowColor: '#8FA3BC',
-    shadowOffset: { width: 6, height: 6 },
-    shadowOpacity: 0.8,
-    shadowRadius: 14,
-    elevation: 8,
-    boxShadow: '8px 8px 18px rgba(143,163,188,0.8), -6px -6px 14px rgba(255,255,255,1)',
+    flex: 1, borderRadius: 20, backgroundColor: '#E8EEF6', padding: 14,
+    boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
   },
-  miniLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 0.9, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold' , paddingLeft: 2 },
+  miniLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 0.9, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold', paddingLeft: 2 },
   miniVal: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 20, fontWeight: '600', color: T.textH },
   algoCard: { marginHorizontal: 16 },
   algoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 10 },

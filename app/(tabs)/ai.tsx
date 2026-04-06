@@ -40,12 +40,6 @@ export default function AIScreen() {
     <View style={{ flex: 1, backgroundColor: T.base }}>
       {/* Header */}
       <View style={[s.hdr, { paddingTop: insets.top + 8 }]}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
-          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-            <Path d="M15 18l-6-6 6-6" stroke={T.textB} strokeWidth={2} strokeLinecap="round" />
-          </Svg>
-          <Text style={s.backTxt}>Back</Text>
-        </TouchableOpacity>
         <Text style={s.title}>LIFEX AI</Text>
         <View style={s.aiAvatar}><Text style={s.aiAvatarTxt}>AI</Text></View>
       </View>
@@ -125,61 +119,52 @@ export default function AIScreen() {
 }
 
 const s = StyleSheet.create({
-  hdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingBottom: 12 },
+  hdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 12 },
   backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backTxt: { fontSize: 13, fontWeight: '600', color: T.textB, fontFamily: 'Syne_700Bold' },
   title: { fontSize: 15, fontWeight: '700', color: T.textH, letterSpacing: 0.5, textTransform: 'uppercase', fontFamily: 'Syne_700Bold' },
   aiAvatar: {
     width: 32, height: 32, borderRadius: 16, backgroundColor: T.orange,
     alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#A3B1C6', shadowOffset: { width: 3, height: 3 }, shadowOpacity: 0.75, shadowRadius: 8, elevation: 5,
+    shadowColor: '#A3B1C6', shadowOffset: { width: 3, height: 3 }, shadowOpacity: 0.6, shadowRadius: 6, elevation: 3,
   },
   aiAvatarTxt: { fontSize: 12, fontWeight: '700', color: '#FFF', fontFamily: 'Syne_700Bold' },
   userBubbleOuter: {
-    shadowColor: '#8FA3BC',
-    shadowOffset: { width: 7, height: 7 },
-    shadowOpacity: 0.85,
-    shadowRadius: 16,
-    elevation: 10,
-    borderRadius: 18, borderBottomRightRadius: 4, backgroundColor: '#E8EEF6',
+    shadowColor: '#A3B1C6',
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+    elevation: 5,
+    boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
+    borderRadius: 18, borderBottomRightRadius: 4,
+    backgroundColor: '#E8EEF6',
     alignSelf: 'flex-end', maxWidth: '80%',
-    boxShadow: '8px 8px 18px rgba(143,163,188,0.8), -6px -6px 14px rgba(255,255,255,1)',
   },
   userBubbleInner: {
     borderRadius: 18, borderBottomRightRadius: 4,
-    borderTopWidth: 1.5, borderLeftWidth: 1.5,
-    borderTopColor: 'rgba(255,255,255,1)', borderLeftColor: 'rgba(255,255,255,1)',
+    borderTopWidth: 0, borderLeftWidth: 0,
     borderBottomWidth: 0, borderRightWidth: 0,
     backgroundColor: '#E8EEF6', padding: 12,
   },
   userTxt: { fontSize: 12, fontWeight: '500', color: T.textH, lineHeight: 19, fontFamily: 'Syne_400Regular' },
   aiBubbleWrap: { alignSelf: 'flex-start', maxWidth: '80%' },
-  aiBubble: { borderRadius: 18, borderBottomLeftRadius: 4, padding: 12, paddingHorizontal: 14 },
+  aiBubble: { borderRadius: 18, borderBottomLeftRadius: 4, padding: 12, paddingHorizontal: 14, backgroundColor: '#DCE4EF' },
   aiTag: { fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: T.orange, marginBottom: 6, fontFamily: 'Syne_700Bold' },
   aiTxt: { fontSize: 12, lineHeight: 19, color: T.textB, fontFamily: 'Syne_400Regular' },
   hlTeal: { color: T.teal, fontWeight: '700', fontFamily: 'JetBrainsMono_600SemiBold' },
   hlTealMono: { color: T.teal, fontWeight: '700', fontFamily: 'JetBrainsMono_600SemiBold' },
   hlPurple: { color: T.purple, fontWeight: '700', fontFamily: 'Syne_700Bold' },
   inputWrap: { paddingHorizontal: 16, paddingTop: 8, backgroundColor: T.base },
-  inputRow: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, paddingLeft: 16, borderRadius: 20 },
+  inputRow: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, paddingLeft: 16, borderRadius: 20, backgroundColor: '#E8EEF6' },
   input: { flex: 1, fontSize: 12, color: T.textS, fontStyle: 'italic' },
   micBtnOuter: {
-    shadowColor: '#8FA3BC',
-    shadowOffset: { width: 7, height: 7 },
-    shadowOpacity: 0.85,
-    shadowRadius: 16,
-    elevation: 10,
-    borderRadius: 20,
-    backgroundColor: '#E8EEF6',
-    boxShadow: '7px 7px 16px rgba(143,163,188,0.75), -5px -5px 12px rgba(255,255,255,1)',
+    shadowColor: '#8FA3BC', shadowOffset: { width: 4, height: 4 }, shadowOpacity: 0.6, shadowRadius: 10, elevation: 5,
+    borderRadius: 20, backgroundColor: '#E8EEF6',
+    boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
   },
   micBtnInner: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: '#E8EEF6',
+    width: 40, height: 40, borderRadius: 20, backgroundColor: '#E8EEF6',
     alignItems: 'center', justifyContent: 'center',
-    borderTopWidth: 1.5, borderLeftWidth: 1.5,
-    borderTopColor: 'rgba(255,255,255,1)',
-    borderLeftColor: 'rgba(255,255,255,1)',
-    borderBottomWidth: 0, borderRightWidth: 0,
+    borderTopWidth: 0, borderLeftWidth: 0, borderBottomWidth: 0, borderRightWidth: 0,
   },
 });

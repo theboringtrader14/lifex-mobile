@@ -68,13 +68,14 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
               >
                 {active ? (
                   <View style={[styles.navIcon, {
-                    backgroundColor: '#C8D4E0',
-                    borderTopWidth: 2, borderLeftWidth: 2,
-                    borderTopColor: 'rgba(143,163,188,0.8)',
-                    borderLeftColor: 'rgba(143,163,188,0.8)',
-                    borderBottomWidth: 2, borderRightWidth: 2,
-                    borderBottomColor: 'rgba(255,255,255,0.95)',
-                    borderRightColor: 'rgba(255,255,255,0.95)',
+                    backgroundColor: '#E8EEF6',
+                    borderTopWidth: 1,
+                    borderLeftWidth: 1,
+                    borderTopColor: 'rgba(143,163,188,0.4)',
+                    borderLeftColor: 'rgba(143,163,188,0.4)',
+                    borderBottomWidth: 0,
+                    borderRightWidth: 0,
+                    boxShadow: 'inset 2px 2px 4px rgba(143,163,188,0.45), inset -4px -4px 8px rgba(255,255,255,1)',
                   }]}>
                     <Icon active={active} />
                   </View>
@@ -112,11 +113,11 @@ const styles = StyleSheet.create({
   navOuter: {
     borderRadius: 28,
     backgroundColor: '#E8EEF6',
-    shadowColor: '#8FA3BC',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 14,
+    shadowColor: '#A3B1C6',
+    shadowOffset: { width: 6, height: 6 },
+    shadowOpacity: 0.75,
+    shadowRadius: 14,
+    elevation: 8,
   },
   navCard: {
     flexDirection: 'row',
@@ -124,8 +125,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8EEF6',
     paddingVertical: 12,
     paddingHorizontal: 8,
-    borderTopWidth: 2,
-    borderTopColor: 'rgba(255,255,255,1)',
+    borderTopWidth: 0,
     borderLeftWidth: 1,
     borderLeftColor: 'rgba(255,255,255,0.7)',
     borderBottomWidth: 0,

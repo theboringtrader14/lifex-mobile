@@ -13,7 +13,7 @@ interface Props {
 export function NeuInset({ children, style, borderRadius = 20, padding, overflow = 'hidden' }: Props) {
   const webShadow: any = Platform.OS === 'web'
     ? {
-        boxShadow: 'inset 5px 5px 14px rgba(143,163,188,0.6), inset -4px -4px 10px rgba(255,255,255,0.95)',
+        boxShadow: 'inset 5px 5px 14px rgba(143,163,188,0.6), inset -7px -7px 16px rgba(255,255,255,1)',
         borderTopWidth: 0,
         borderLeftWidth: 0,
         borderBottomWidth: 0,

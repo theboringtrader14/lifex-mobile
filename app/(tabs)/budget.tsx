@@ -42,12 +42,6 @@ export default function BudgetScreen() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View style={s.hdr}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
-          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-            <Path d="M15 18l-6-6 6-6" stroke={T.textB} strokeWidth={2} strokeLinecap="round" />
-          </Svg>
-          <Text style={s.backTxt}>Back</Text>
-        </TouchableOpacity>
         <Text style={s.title}>BUDGET</Text>
         <View style={{ width: 60 }} />
       </View>
@@ -118,11 +112,10 @@ const s = StyleSheet.create({
   progressWrap: { marginHorizontal: 16, marginTop: 10 },
   progressTrack: {
     height: 10, borderRadius: 8, overflow: 'hidden',
-    backgroundColor: '#D1DCE8',
-    borderTopWidth: 1.5, borderLeftWidth: 1.5,
-    borderTopColor: 'rgba(143,163,188,0.9)', borderLeftColor: 'rgba(143,163,188,0.9)',
-    borderBottomWidth: 1.5, borderRightWidth: 1.5,
-    borderBottomColor: 'rgba(255,255,255,1)', borderRightColor: 'rgba(255,255,255,1)',
+    backgroundColor: '#E8EEF6',
+    borderTopWidth: 1, borderLeftWidth: 1,
+    borderTopColor: 'rgba(143,163,188,0.4)', borderLeftColor: 'rgba(143,163,188,0.4)',
+    borderBottomWidth: 0, borderRightWidth: 0,
   },
   progressFill: { height: '100%', borderRadius: 8, backgroundColor: T.purple },
   catCard: { marginHorizontal: 16 },
@@ -131,24 +124,26 @@ const s = StyleSheet.create({
   catBarWrap: { flex: 1 },
   catTrack: {
     height: 8, borderRadius: 6, overflow: 'hidden',
-    backgroundColor: '#D1DCE8',
+    backgroundColor: '#E8EEF6',
     borderTopWidth: 1, borderLeftWidth: 1,
-    borderTopColor: 'rgba(143,163,188,0.8)', borderLeftColor: 'rgba(143,163,188,0.8)',
-    borderBottomWidth: 1, borderRightWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,1)', borderRightColor: 'rgba(255,255,255,1)',
+    borderTopColor: 'rgba(143,163,188,0.4)', borderLeftColor: 'rgba(143,163,188,0.4)',
+    borderBottomWidth: 0, borderRightWidth: 0,
   },
   catFill: { height: '100%', borderRadius: 6 },
-  catPct: { fontFamily: 'JetBrainsMono_400Regular', fontSize: 11, color: T.textM, width: 28, textAlign: 'right' },
-  catAmt: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 11, fontWeight: '600', color: T.textH, width: 44, textAlign: 'right' },
-  expCard: { marginHorizontal: 16, marginBottom: 8 },
-  expRow: { flexDirection: 'row', alignItems: 'center', padding: 12, paddingHorizontal: 16 },
+  catPct: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 11, color: T.textM, width: 28, textAlign: 'right' },
+  catAmt: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 11, fontWeight: '600', color: T.textH, width: 48, textAlign: 'right' },
+  expCard: { marginHorizontal: 16, marginBottom: 14 },
+  expRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, paddingHorizontal: 16 },
+  expenseRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, paddingHorizontal: 16 },
   expIcon: {
     width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: T.base, shadowColor: '#A3B1C6', shadowOffset: { width: 3, height: 3 }, shadowOpacity: 0.75, shadowRadius: 6, elevation: 4,
+    backgroundColor: '#E8EEF6', marginRight: 10,
+    shadowColor: '#A3B1C6', shadowOffset: { width: 3, height: 3 }, shadowOpacity: 0.6, shadowRadius: 6, elevation: 3,
   },
   expName: { fontSize: 13, fontWeight: '600', color: T.textH, fontFamily: 'Syne_700Bold' },
   expSub: { fontSize: 10, color: T.textM, marginTop: 1, fontFamily: 'Syne_400Regular' },
   expAmt: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 13, fontWeight: '600', color: T.red },
-  addBtn: { marginHorizontal: 16, marginTop: 10, padding: 14, alignItems: 'center', justifyContent: 'center' },
-  addBtnTxt: { fontSize: 13, fontWeight: '700', letterSpacing: 0.5, color: T.orange, fontFamily: 'Syne_700Bold' },
+  addBtn: { marginHorizontal: 16, marginTop: 4 },
+  addBtnRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14 },
+  addBtnTxt: { fontSize: 13, fontWeight: '700', color: T.orange, fontFamily: 'Syne_700Bold' },
 });

@@ -34,8 +34,6 @@ export const NEU_INSET = {
   borderLeftWidth: 1,
   borderTopColor: 'rgba(143,163,188,0.4)',
   borderLeftColor: 'rgba(143,163,188,0.4)',
-  borderBottomWidth: 1,
-  borderRightWidth: 1,
-  borderBottomColor: 'rgba(255,255,255,0.7)',
-  borderRightColor: 'rgba(255,255,255,0.7)',
+  borderBottomWidth: 0,
+  borderRightWidth: 0,
 };

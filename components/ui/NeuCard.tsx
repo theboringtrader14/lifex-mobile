@@ -40,7 +40,7 @@ export function NeuCard({ children, style, borderRadius = 20, padding, overflow 
   }
 
   const webShadow: any = Platform.OS === 'web'
-    ? { boxShadow: '8px 8px 18px rgba(143,163,188,0.8), -3px -3px 8px rgba(255,255,255,0.7)' }
+    ? { boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)' }
     : {};
 
   return (
@@ -52,8 +52,7 @@ export function NeuCard({ children, style, borderRadius = 20, padding, overflow 
     }, style]}>
       <View style={{
         borderRadius: borderRadius > 1 ? borderRadius - 1 : borderRadius,
-        borderTopWidth: 1.5,
-        borderTopColor: 'rgba(255,255,255,1)',
+        borderTopWidth: 0,
         borderLeftWidth: 0,
         borderBottomWidth: 0,
         borderRightWidth: 0,
