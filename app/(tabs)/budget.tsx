@@ -7,7 +7,7 @@ import { NeuInset } from '../../components/ui/NeuInset';
 import { SectionLabel } from '../../components/ui/SectionLabel';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getBudgetSummary } from '../../src/services/api';
+import { getBudgetSummary, getRecentExpenses } from '../../src/services/api';
 
 const CATS = [
   { name: 'Food', pct: 23, color: T.teal, amt: '₹4,200' },
@@ -17,19 +17,19 @@ const CATS = [
   { name: 'Others', pct: 11, color: T.textM, amt: '₹2,000' },
 ];
 
-const EXPENSES = [
-  { emoji: '🍔', name: 'Swiggy', sub: 'Food · Today', amt: '−₹350' },
-  { emoji: '🚗', name: 'Uber', sub: 'Travel · Today', amt: '−₹220' },
-  { emoji: '⚡', name: 'Electricity', sub: 'Bills · Apr 3', amt: '−₹1,200' },
-];
-
 export default function BudgetScreen() {
   const insets = useSafeAreaInsets();
 
   const [budgetData, setBudgetData] = useState<any>(null);
+  const [recentExpenses, setRecentExpenses] = useState<any[]>([]);
+
+  const CAT_EMOJI: Record<string, string> = {
+    Food: '🍔', Travel: '🚗', Bills: '⚡', Shopping: '🛍️', Others: '💰',
+  };
 
   useEffect(() => {
     getBudgetSummary().then(setBudgetData).catch(() => {});
+    getRecentExpenses(5).then(data => setRecentExpenses(Array.isArray(data) ? data : [])).catch(() => {});
   }, []);
 
   const formatValue = (val: number | undefined) => {
@@ -48,14 +48,14 @@ export default function BudgetScreen() {
 
       <View style={s.hero}>
         <Text style={s.heroLbl}>THIS MONTH</Text>
-        <Text style={s.heroVal}>{budgetData ? formatValue(budgetData.monthly_total) : '...'}</Text>
+        <Text style={s.heroVal}>{budgetData ? formatValue(budgetData.monthly) : '...'}</Text>
         <Text style={s.heroBudget}>of {budgetData ? formatValue(budgetData.monthly_budget ?? 30000) : '₹30,000'} budget</Text>
       </View>
 
       {/* Progress bar */}
       <View style={s.progressWrap}>
         <NeuInset style={s.progressTrack} borderRadius={8}>
-          <View style={[s.progressFill, { width: `${budgetData ? Math.min(100, Math.round((budgetData.monthly_total / (budgetData.monthly_budget ?? 30000)) * 100)) : 61}%` }]} />
+          <View style={[s.progressFill, { width: `${budgetData ? Math.min(100, Math.round((budgetData.monthly / (budgetData.monthly_budget ?? 30000)) * 100)) : 61}%` }]} />
         </NeuInset>
       </View>
 
@@ -78,20 +78,28 @@ export default function BudgetScreen() {
       </NeuCard>
 
       <SectionLabel label="RECENT EXPENSES" style={{ marginTop: 16 }} />
-      {EXPENSES.map((e) => (
-        <NeuCard key={e.name} style={s.expCard} borderRadius={20} padding={0}>
+      {recentExpenses.length === 0 ? (
+        <NeuCard style={s.expCard} borderRadius={20} padding={0}>
           <View style={s.expRow}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-              <View style={s.expIcon}><Text style={{ fontSize: 14 }}>{e.emoji}</Text></View>
-              <View style={{ marginLeft: 10 }}>
-                <Text style={s.expName}>{e.name}</Text>
-                <Text style={s.expSub}>{e.sub}</Text>
-              </View>
-            </View>
-            <Text style={s.expAmt}>{e.amt}</Text>
+            <Text style={{ color: T.textS, fontSize: 12, fontFamily: 'Syne_400Regular' }}>No expenses recorded yet</Text>
           </View>
         </NeuCard>
-      ))}
+      ) : (
+        recentExpenses.map((e) => (
+          <NeuCard key={e.id} style={s.expCard} borderRadius={20} padding={0}>
+            <View style={s.expRow}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                <View style={s.expIcon}><Text style={{ fontSize: 14 }}>{CAT_EMOJI[e.category] ?? '💰'}</Text></View>
+                <View style={{ marginLeft: 10 }}>
+                  <Text style={s.expName}>{e.description || e.category}</Text>
+                  <Text style={s.expSub}>{e.category} · {e.date}</Text>
+                </View>
+              </View>
+              <Text style={s.expAmt}>−₹{e.amount}</Text>
+            </View>
+          </NeuCard>
+        ))
+      )}
 
       <TouchableOpacity activeOpacity={0.85}>
         

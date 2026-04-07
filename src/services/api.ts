@@ -34,3 +34,9 @@ export const analyzeAI = (message: string) =>
 
 export const chatAI = (message: string) =>
   STAAX.post('/api/v1/ai/chat', { message, context: {} }).then(r => r.data);
+
+export const getRecentExpenses = (limit = 5) =>
+  BUDGEX.get('/api/v1/expenses', { params: { limit } }).then(r => r.data);
+
+export const createExpense = (data: { amount: number; category: string; description?: string; date?: string }) =>
+  BUDGEX.post('/api/v1/expenses', data).then(r => r.data);

@@ -40,8 +40,8 @@ export default function PortfolioScreen() {
 
       <View style={s.hero}>
         <Text style={s.heroLbl}>TOTAL</Text>
-        <Text style={s.heroVal}>{summary ? formatValue(summary.total_value) : '...'}</Text>
-        <Text style={s.heroGain}>{summary ? `▲ ${summary.total_gain_pct?.toFixed(2) ?? '0.00'}% overall` : '▲ ...'}</Text>
+        <Text style={s.heroVal}>{summary ? formatValue(summary.total_portfolio_value) : '...'}</Text>
+        <Text style={s.heroGain}>{summary ? `▲ ${summary.total_pnl_pct?.toFixed(2) ?? '0.00'}% overall` : '▲ ...'}</Text>
       </View>
 
       {/* Equity curve */}
@@ -80,20 +80,27 @@ export default function PortfolioScreen() {
 
       <SectionLabel label="TOP HOLDINGS" style={{ marginTop: 16 }} />
       <NeuCard style={s.holdingsCard} borderRadius={20} overflow="hidden">
-        {[
-          { ticker: 'JSWSTEEL', val: '₹2.8L', pct: '+32%' },
-          { ticker: 'MAZDOCK', val: '₹1.9L', pct: '+206%' },
-          { ticker: 'TATAPOWER', val: '₹1.9L', pct: '+12%' },
-        ].map((h, i) => (
-          <React.Fragment key={h.ticker}>
-            {i > 0 && <View style={s.rowDiv} />}
-            <View style={s.holdingRow}>
-              <Text style={s.holdingTicker}>{h.ticker}</Text>
-              <Text style={s.holdingVal}>{h.val}</Text>
-              <Text style={s.holdingPct}>{h.pct}</Text>
-            </View>
-          </React.Fragment>
-        ))}
+        {holdings.length === 0 ? (
+          <View style={s.holdingRow}>
+            <Text style={[s.holdingTicker, { color: T.textS }]}>No holdings data</Text>
+          </View>
+        ) : (
+          [...holdings]
+            .sort((a, b) => (b.current_value || 0) - (a.current_value || 0))
+            .slice(0, 5)
+            .map((h, i) => (
+              <React.Fragment key={h.symbol}>
+                {i > 0 && <View style={s.rowDiv} />}
+                <View style={s.holdingRow}>
+                  <Text style={s.holdingTicker}>{h.symbol}</Text>
+                  <Text style={s.holdingVal}>{formatValue(h.current_value)}</Text>
+                  <Text style={[s.holdingPct, { color: (h.pnl_pct || 0) >= 0 ? T.green : T.red }]}>
+                    {(h.pnl_pct || 0) >= 0 ? '+' : ''}{(h.pnl_pct || 0).toFixed(1)}%
+                  </Text>
+                </View>
+              </React.Fragment>
+            ))
+        )}
       </NeuCard>
     </ScrollView>
   );

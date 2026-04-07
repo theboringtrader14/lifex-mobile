@@ -39,8 +39,9 @@ export default function AIScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: T.base }}>
       {/* Header */}
-      <View style={[s.hdr, { paddingTop: insets.top + 8 }]}>
-        <Text style={s.title}>LIFEX AI</Text>
+      <View style={s.hdr}>
+        <View style={{ width: 32, height: 32 }} />
+        <Text style={[s.title, { flex: 1, textAlign: 'center' }]}>LIFEX AI</Text>
         <View style={s.aiAvatar}><Text style={s.aiAvatarTxt}>AI</Text></View>
       </View>
 
