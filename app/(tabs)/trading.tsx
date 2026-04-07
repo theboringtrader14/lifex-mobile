@@ -4,7 +4,6 @@ import { router } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { NeuCard } from '../../components/ui/NeuCard';
 import { SectionLabel } from '../../components/ui/SectionLabel';
-import { StatBadge } from '../../components/ui/StatBadge';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getSystemStats, getOrders, getAlgos } from '../../src/services/api';
@@ -15,9 +14,10 @@ export default function TradingScreen() {
   const [stats, setStats] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [algos, setAlgos] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getSystemStats().then(setStats).catch(() => {});
+    getSystemStats().then(setStats).catch(() => setError('Unable to load stats'));
     getOrders().then(d => setOrders(Array.isArray(d) ? d : d?.items ?? [])).catch(() => {});
     getAlgos().then(d => setAlgos(Array.isArray(d) ? d : d?.items ?? [])).catch(() => {});
   }, []);
@@ -58,15 +58,15 @@ export default function TradingScreen() {
       {/* Header */}
       <View style={s.hdr}>
         <Text style={s.title}>TRADING</Text>
-        <StatBadge label="PRACTIX" />
       </View>
+
+      {error && <Text style={{ color: T.red, fontSize: 11, textAlign: 'center', marginHorizontal: 16, marginTop: 4, fontFamily: 'Syne_400Regular' }}>{error}</Text>}
 
       {/* Hero P&L */}
       <View style={s.heroOuter}>
         <View style={s.heroInner}>
           <Text style={s.heroLbl}>FY P&L</Text>
           <Text style={s.heroVal}>{stats ? formatPnl(stats.fy_pnl) : '...'}</Text>
-          <Text style={s.heroRoi}>▲ 0.02% ROI</Text>
         </View>
       </View>
 
@@ -121,14 +121,11 @@ export default function TradingScreen() {
 
 const s = StyleSheet.create({
   hdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 12 },
-  backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  backTxt: { fontSize: 13, fontWeight: '600', color: T.textB, fontFamily: 'Syne_700Bold' },
   title: { fontSize: 15, fontWeight: '700', color: T.textH, letterSpacing: 0.5, textTransform: 'uppercase', fontFamily: 'Syne_700Bold' },
   heroOuter: { marginHorizontal: 16 },
   heroInner: { alignItems: 'center', paddingVertical: 20, paddingHorizontal: 16 },
   heroLbl: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold' },
   heroVal: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 36, fontWeight: '700', color: T.green, letterSpacing: -1 },
-  heroRoi: { fontSize: 12, color: T.textM, marginTop: 4, fontFamily: 'Syne_400Regular' },
   twoCol: { flexDirection: 'row', gap: 18, paddingHorizontal: 16, marginTop: 6 },
   miniCard: {
     flex: 1, borderRadius: 20, backgroundColor: '#E8EEF6', padding: 14,

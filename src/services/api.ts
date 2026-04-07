@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { STAAX_URL, INVEX_URL, BUDGEX_URL } from '../config';
 
-const STAAX = axios.create({ baseURL: STAAX_URL });
-const INVEX = axios.create({ baseURL: INVEX_URL });
-const BUDGEX = axios.create({ baseURL: BUDGEX_URL });
+const STAAX = axios.create({ baseURL: STAAX_URL, timeout: 10000 });
+const INVEX = axios.create({ baseURL: INVEX_URL, timeout: 10000 });
+const BUDGEX = axios.create({ baseURL: BUDGEX_URL, timeout: 10000 });
 
 export const getHomeDashboard = () =>
   STAAX.get('/api/v1/mobile/dashboard').then(r => r.data);
@@ -31,9 +31,6 @@ export const getBudgetSummary = () =>
 
 export const analyzeAI = (message: string) =>
   STAAX.post('/api/v1/ai/analyze', { message, context: {} }).then(r => r.data);
-
-export const chatAI = (message: string) =>
-  STAAX.post('/api/v1/ai/chat', { message, context: {} }).then(r => r.data);
 
 export const getRecentExpenses = (limit = 5) =>
   BUDGEX.get('/api/v1/expenses', { params: { limit } }).then(r => r.data);

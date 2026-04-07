@@ -17,9 +17,10 @@ export default function PortfolioScreen() {
 
   const [summary, setSummary] = useState<any>(null);
   const [holdings, setHoldings] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getPortfolioSummary().then(setSummary).catch(() => {});
+    getPortfolioSummary().then(setSummary).catch(() => setError('Unable to load portfolio'));
     getPortfolio().then(d => setHoldings(Array.isArray(d) ? d : d?.holdings ?? [])).catch(() => {});
   }, []);
 
@@ -58,10 +59,12 @@ export default function PortfolioScreen() {
         </Svg>
       </NeuInset>
 
+      {error && <Text style={{ color: T.red, fontSize: 11, textAlign: 'center', marginHorizontal: 16, marginTop: 4, fontFamily: 'Syne_400Regular' }}>{error}</Text>}
+
       <SectionLabel label="BREAKDOWN" style={{ marginTop: 16 }} />
       {[
-        { emoji: '📈', name: 'Equity Portfolio', sub: '37 stocks · Zerodha + AO', val: '₹46.8L' },
-        { emoji: '💼', name: 'Mutual Funds', sub: '9 funds · Zerodha Coin', val: '₹0' },
+        { emoji: '📈', name: 'Equity Portfolio', sub: `${holdings.length > 0 ? holdings.length : '—'} stocks`, val: summary ? formatValue(summary.total_portfolio_value) : '...' },
+        { emoji: '💼', name: 'Mutual Funds', sub: '—', val: '₹0' },
         { emoji: '🏦', name: 'Cash / Bank', sub: 'Manual entry', val: '—' },
       ].map((a) => (
         <NeuCard key={a.name} style={s.assetCard} borderRadius={20} padding={0}>
@@ -108,8 +111,6 @@ export default function PortfolioScreen() {
 
 const s = StyleSheet.create({
   hdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 12 },
-  backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  backTxt: { fontSize: 13, fontWeight: '600', color: T.textB, fontFamily: 'Syne_700Bold' },
   title: { fontSize: 15, fontWeight: '700', color: T.textH, letterSpacing: 0.5, textTransform: 'uppercase', fontFamily: 'Syne_700Bold' },
   hero: { alignItems: 'center', paddingHorizontal: 24, paddingVertical: 14 },
   heroLbl: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold' },

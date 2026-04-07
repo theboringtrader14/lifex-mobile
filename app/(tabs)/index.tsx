@@ -9,6 +9,7 @@ import { MicButton } from '../../components/ui/MicButton';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getHomeDashboard, getPortfolioSummary, getBudgetSummary, analyzeAI, createExpense } from '../../src/services/api';
+import { USER_NAME, USER_INITIAL } from '../../src/constants';
 import { Audio } from 'expo-av';
 
 const { width } = Dimensions.get('window');
@@ -28,7 +29,7 @@ function WidgetCard({ w }: { w: { color: string; label: string; value: string; s
       style={{ flex: 1 }}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
-      onPress={() => router.push(w.route as any)}
+      onPress={() => router.push(w.route as `/${string}`)}
     >
       <NeuCard style={{ flex: 1 }} borderRadius={20} overflow="hidden" pressed={pressed}>
         <View style={[s.accent, { backgroundColor: w.color }]} />
@@ -70,6 +71,7 @@ export default function HomeScreen() {
   const [dashboard, setDashboard] = useState<any>(null);
   const [portfolioSummary, setPortfolioSummary] = useState<any>(null);
   const [budgetSummary, setBudgetSummary] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'processing' | 'confirming'>('idle');
   const [manualInput, setManualInput] = useState('');
@@ -77,7 +79,7 @@ export default function HomeScreen() {
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    getHomeDashboard().then(setDashboard).catch(() => {});
+    getHomeDashboard().then(setDashboard).catch(() => setError('Unable to load dashboard'));
     getPortfolioSummary().then(setPortfolioSummary).catch(() => {});
     getBudgetSummary().then(setBudgetSummary).catch(() => {});
   }, []);
@@ -181,8 +183,13 @@ export default function HomeScreen() {
     }
   };
 
+  const dayChangePct = portfolioSummary?.day_pnl_pct;
+  const dayChangeStr = dayChangePct != null
+    ? `${dayChangePct >= 0 ? '+' : ''}${dayChangePct.toFixed(2)}% today`
+    : '— today';
+
   const widgets = [
-    { color: T.teal, label: 'NET WORTH', value: formatValue(portfolioSummary?.total_portfolio_value), sub: '+0.5% today', subColor: T.teal, route: '/portfolio' },
+    { color: T.teal, label: 'NET WORTH', value: formatValue(portfolioSummary?.total_portfolio_value), sub: dayChangeStr, subColor: dayChangePct != null ? (dayChangePct >= 0 ? T.teal : T.red) : T.textM, route: '/portfolio' },
     { color: T.orange, label: 'TRADING', value: formatPnl(dashboard?.trading?.today_pnl), sub: 'today P&L', subColor: T.textM, route: '/trading' },
     { color: T.purple, label: 'BUDGET', value: formatValue(budgetSummary?.monthly), sub: 'this month', subColor: T.textM, route: '/budget' },
   ];
@@ -261,10 +268,10 @@ export default function HomeScreen() {
       <View style={s.hdr}>
         <View>
           <Text style={s.greeting}>Good morning,</Text>
-          <Text style={s.name}>Karthik</Text>
+          <Text style={s.name}>{USER_NAME}</Text>
         </View>
         <View style={s.avatar}>
-          <Text style={s.avatarText}>K</Text>
+          <Text style={s.avatarText}>{USER_INITIAL}</Text>
         </View>
       </View>
 
@@ -296,6 +303,12 @@ export default function HomeScreen() {
           </View>
         </View>
       </NeuCard>
+
+      {error && (
+        <Text style={{ color: T.red, fontSize: 11, textAlign: 'center', marginHorizontal: 16, marginTop: 8, fontFamily: 'Syne_400Regular' }}>
+          {error}
+        </Text>
+      )}
 
       <SectionLabel label="LIFEX AI" style={{ marginTop: 14 }} />
 

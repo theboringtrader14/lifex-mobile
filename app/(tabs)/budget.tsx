@@ -22,13 +22,14 @@ export default function BudgetScreen() {
 
   const [budgetData, setBudgetData] = useState<any>(null);
   const [recentExpenses, setRecentExpenses] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const CAT_EMOJI: Record<string, string> = {
     Food: '🍔', Travel: '🚗', Bills: '⚡', Shopping: '🛍️', Others: '💰',
   };
 
   useEffect(() => {
-    getBudgetSummary().then(setBudgetData).catch(() => {});
+    getBudgetSummary().then(setBudgetData).catch(() => setError('Unable to load budget'));
     getRecentExpenses(5).then(data => setRecentExpenses(Array.isArray(data) ? data : [])).catch(() => {});
   }, []);
 
@@ -58,6 +59,8 @@ export default function BudgetScreen() {
           <View style={[s.progressFill, { width: `${budgetData ? Math.min(100, Math.round((budgetData.monthly / (budgetData.monthly_budget ?? 30000)) * 100)) : 61}%` }]} />
         </NeuInset>
       </View>
+
+      {error && <Text style={{ color: T.red, fontSize: 11, textAlign: 'center', marginHorizontal: 16, marginTop: 4, fontFamily: 'Syne_400Regular' }}>{error}</Text>}
 
       <SectionLabel label="BY CATEGORY" style={{ marginTop: 16 }} />
       <NeuCard style={s.catCard} borderRadius={20} overflow="hidden" padding={0}>
@@ -110,8 +113,6 @@ export default function BudgetScreen() {
 
 const s = StyleSheet.create({
   hdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 12 },
-  backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  backTxt: { fontSize: 13, fontWeight: '600', color: T.textB, fontFamily: 'Syne_700Bold' },
   title: { fontSize: 15, fontWeight: '700', color: T.textH, letterSpacing: 0.5, textTransform: 'uppercase', fontFamily: 'Syne_700Bold' },
   hero: { alignItems: 'center', paddingHorizontal: 24, paddingVertical: 12, paddingBottom: 6 },
   heroLbl: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold' },
