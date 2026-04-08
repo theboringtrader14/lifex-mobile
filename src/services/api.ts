@@ -41,3 +41,6 @@ export const createExpense = (data: {
   description: string
   date: string
 }) => BUDGEX.post('/api/v1/expenses/', data).then(r => r.data);
+
+export const parseExpense = (text: string) =>
+  BUDGEX.post('/api/v1/parse', { text }).then((r) => r.data);
