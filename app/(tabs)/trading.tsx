@@ -57,7 +57,7 @@ export default function TradingScreen() {
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={s.hdr}>
-        <Text style={s.title}>TRADING</Text>
+        <Text style={s.title}>STAAX</Text>
       </View>
 
       {error && <Text style={{ color: T.red, fontSize: 11, textAlign: 'center', marginHorizontal: 16, marginTop: 4, fontFamily: 'Syne_400Regular' }}>{error}</Text>}

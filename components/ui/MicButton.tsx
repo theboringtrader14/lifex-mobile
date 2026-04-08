@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { View, TouchableOpacity, StyleSheet, Animated, Platform } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import Svg, { Rect, Path, Line } from 'react-native-svg';
 import { T } from '../../theme';
-import { NEU_RAISED_SM } from '../../constants/Shadows';
 
 interface Props { onPress: () => void; listening?: boolean }
 
@@ -57,16 +56,13 @@ export function MicButton({ onPress, listening = false }: Props) {
         }}
       />
       <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
-        <View style={[styles.btnWrap, Platform.OS === 'web' ? { boxShadow: '7px 7px 16px rgba(143,163,188,0.75), -5px -5px 12px rgba(255,255,255,1)' } as any : {}]}>
-          <View style={[StyleSheet.absoluteFillObject, styles.btnLight]} pointerEvents="none" />
-          <View style={[styles.btn, NEU_RAISED_SM]}>
-            <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
-              <Rect x={9} y={3} width={6} height={11} rx={3} fill={T.orange} />
-              <Path d="M5 11a7 7 0 0014 0" stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
-              <Line x1={12} y1={18} x2={12} y2={21} stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
-              <Line x1={9} y1={21} x2={15} y2={21} stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
-            </Svg>
-          </View>
+        <View style={styles.btnWrap as any}>
+          <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
+            <Rect x={9} y={3} width={6} height={11} rx={3} fill={T.orange} />
+            <Path d="M5 11a7 7 0 0014 0" stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
+            <Line x1={12} y1={18} x2={12} y2={21} stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
+            <Line x1={9} y1={21} x2={15} y2={21} stroke={T.orange} strokeWidth={1.8} strokeLinecap="round" />
+          </Svg>
         </View>
       </TouchableOpacity>
     </View>
@@ -77,26 +73,7 @@ const styles = StyleSheet.create({
   btnWrap: {
     width: 66, height: 66, borderRadius: 33,
     backgroundColor: '#E8EEF6',
-    // iOS dark shadow
-    shadowColor: '#8FA3BC',
-    shadowOffset: { width: 7, height: 7 },
-    shadowOpacity: 0.85,
-    shadowRadius: 16,
-    elevation: 10,
-  },
-  btnLight: {
-    borderRadius: 33,
-    backgroundColor: 'transparent',
-    borderTopWidth: 1.5,
-    borderLeftWidth: 1.5,
-    borderTopColor: 'rgba(255,255,255,1)',
-    borderLeftColor: 'rgba(255,255,255,1)',
-    borderBottomWidth: 0,
-    borderRightWidth: 0,
-  },
-  btn: {
-    width: 66, height: 66, borderRadius: 33,
-    backgroundColor: '#E8EEF6',
     alignItems: 'center', justifyContent: 'center',
+    boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
   },
 });

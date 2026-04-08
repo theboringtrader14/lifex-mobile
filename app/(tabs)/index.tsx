@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, ScrollView, StyleSheet, Pressable, Dimensions, Platform, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Pressable, Dimensions, Platform, TextInput, Alert } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { NeuCard } from '../../components/ui/NeuCard';
@@ -319,7 +319,17 @@ export default function HomeScreen() {
         </NeuInset>
         {/* Mic — half overlaps bottom of container */}
         <View style={s.micAnchor}>
+          {/* Clear button — left of mic */}
+          <TouchableOpacity style={s.actionBtn} onPress={() => { setManualInput(''); setVoiceState('idle'); setParsedExpense(null); }}>
+            <Text style={s.actionBtnTxt}>CLEAR</Text>
+          </TouchableOpacity>
+
           <MicButton onPress={handleMicPress} listening={voiceState === 'listening'} />
+
+          {/* Push button — right of mic */}
+          <TouchableOpacity style={[s.actionBtn, s.actionBtnPush]} onPress={() => { /* backend handled by Karthik */ }}>
+            <Text style={[s.actionBtnTxt, s.actionBtnPushTxt]}>PUSH</Text>
+          </TouchableOpacity>
         </View>
         <Text style={s.tapHint}>
           {voiceState === 'idle' ? 'TAP MIC TO RECORD EXPENSE' :
@@ -332,36 +342,44 @@ export default function HomeScreen() {
 }
 
 const s = StyleSheet.create({
-  hdr: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 12, paddingBottom: 4 },
-  greeting: { fontSize: 12, color: T.textM, fontFamily: 'Syne_400Regular' },
-  name: { fontSize: 22, fontWeight: '800', color: T.textH, letterSpacing: -0.5, fontFamily: 'Syne_800ExtraBold' },
+  hdr: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 8 },
+  greeting: { fontSize: 12, color: T.textM, fontWeight: '400', fontFamily: 'Syne_400Regular' },
+  name: { fontSize: 22, fontWeight: '800', color: T.textH, letterSpacing: -0.5, fontFamily: 'Syne_700Bold' },
   avatar: {
     width: 42, height: 42, borderRadius: 21,
-    backgroundColor: T.orange, alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#A3B1C6', shadowOffset: { width: 4, height: 4 }, shadowOpacity: 0.75, shadowRadius: 10, elevation: 5,
+    backgroundColor: T.orange,
+    alignItems: 'center', justifyContent: 'center',
+    boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
   },
   avatarText: { fontSize: 16, fontWeight: '700', color: '#FFF', fontFamily: 'Syne_700Bold' },
   widgetRow: { flexDirection: 'row', gap: 18, paddingHorizontal: 16, marginTop: 6 },
   accent: { position: 'absolute', top: 0, left: 0, right: 0, height: 3 },
   dot: { width: 7, height: 7, borderRadius: 3.5, marginBottom: 8 },
-  wLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: T.textS, marginBottom: 3, fontFamily: 'Syne_700Bold' },
-  wVal: { fontSize: 15, fontWeight: '600', color: T.textH, letterSpacing: -0.5, fontFamily: 'JetBrainsMono_600SemiBold', marginBottom: 2 },
+  wLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: T.textS, fontFamily: 'Syne_700Bold' },
+  wVal: { fontSize: 15, fontWeight: '600', color: T.textH, letterSpacing: -0.5, fontFamily: 'JetBrainsMono_600SemiBold' },
   wSub: { fontSize: 9, fontWeight: '500', fontFamily: 'Syne_400Regular' },
   arrowCircle: {
     position: 'absolute', bottom: 10, right: 10,
     width: 20, height: 20, borderRadius: 10,
     backgroundColor: '#E8EEF6', alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#A3B1C6', shadowOffset: { width: 2, height: 2 }, shadowOpacity: 0.6, shadowRadius: 4, elevation: 3,
     boxShadow: '3px 3px 6px rgba(163,177,198,0.6), -2px -2px 5px rgba(255,255,255,0.92)',
   },
   statsStrip: { marginHorizontal: 16, marginTop: 14 },
   statItem: { flex: 1, alignItems: 'center' },
-  statNum: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 20, fontWeight: '600', marginBottom: 4 },
+  statNum: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 20, fontWeight: '600', color: T.textH },
   statLbl: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', color: T.textS, fontFamily: 'Syne_700Bold' },
   voiceWrap: { paddingHorizontal: 16, alignItems: 'center', marginBottom: 16 },
   voiceBox: { width: '100%', padding: 20, paddingBottom: 60, minHeight: 220 },
-  micAnchor: { marginTop: -38, zIndex: 10 },
-  voiceHint: { fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: T.textS, marginBottom: 10, fontFamily: 'Syne_700Bold' },
+  micAnchor: { marginTop: -38, zIndex: 10, flexDirection: 'row', alignItems: 'center', gap: 26 },
+  actionBtn: {
+    paddingHorizontal: 16, paddingVertical: 10,
+    borderRadius: 20, backgroundColor: '#E8EEF6',
+    boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
+  },
+  actionBtnTxt: { fontSize: 10, fontWeight: '700', letterSpacing: 1, color: T.textS, fontFamily: 'Syne_700Bold' },
+  actionBtnPush: { backgroundColor: '#E8EEF6' },
+  actionBtnPushTxt: { color: T.orange },
+  voiceHint: { fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: T.textS, marginTop: 16, fontFamily: 'Syne_700Bold' },
   voiceText: { fontSize: 14, color: T.textB, lineHeight: 22, fontStyle: 'italic', fontFamily: 'Syne_400Regular' },
   voiceInput: {
     fontSize: 14, color: T.textH, fontFamily: 'Syne_400Regular',

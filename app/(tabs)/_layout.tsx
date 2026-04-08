@@ -41,18 +41,18 @@ const AIIcon = ({ active }: { active: boolean }) => (
 
 const TABS = [
   { name: 'index', label: 'HOME', Icon: HomeIcon },
-  { name: 'trading', label: 'TRADE', Icon: TradeIcon },
-  { name: 'portfolio', label: 'PORTFOLIO', Icon: PortfolioIcon },
-  { name: 'budget', label: 'BUDGET', Icon: BudgetIcon },
+  { name: 'trading', label: 'STAAX', Icon: TradeIcon },
+  { name: 'portfolio', label: 'INVEX', Icon: PortfolioIcon },
+  { name: 'budget', label: 'BUDGEX', Icon: BudgetIcon },
   { name: 'ai', label: 'AI', Icon: AIIcon },
 ];
 
 function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.navWrap, { paddingBottom: insets.bottom > 0 ? insets.bottom - 8 : 8 }]}>
+    <View style={[styles.navWrap, { paddingBottom: insets.bottom > 0 ? insets.bottom - 8 : 8, backgroundColor: 'transparent' }]}>
       {/* Outer — dark bottom shadow */}
-      <View style={[styles.navOuter, isWeb && { boxShadow: '0px 8px 20px rgba(143,163,188,0.7)' }]}>
+      <View style={styles.navOuter}>
         {/* Inner — white top highlight border */}
         <View style={styles.navCard}>
           {state.routes.map((route, idx) => {
@@ -98,7 +98,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
 export default function TabLayout() {
   return (
-    <Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
+    <Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false, tabBarStyle: { backgroundColor: 'transparent', borderTopWidth: 0, elevation: 0, shadowOpacity: 0, position: 'absolute' } }}>
       <Tabs.Screen name="index" />
       <Tabs.Screen name="trading" />
       <Tabs.Screen name="portfolio" />
@@ -109,27 +109,18 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  navWrap: { backgroundColor: '#E8EEF6', paddingHorizontal: 16, paddingTop: 0, paddingBottom: 0 },
+  navWrap: { backgroundColor: 'transparent', paddingHorizontal: 16, paddingTop: 6, paddingBottom: 0 },
   navOuter: {
     borderRadius: 28,
     backgroundColor: '#E8EEF6',
-    shadowColor: '#A3B1C6',
-    shadowOffset: { width: 6, height: 6 },
-    shadowOpacity: 0.75,
-    shadowRadius: 14,
-    elevation: 8,
+    boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
   },
   navCard: {
-    flexDirection: 'row',
-    borderRadius: 28,
-    backgroundColor: '#E8EEF6',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderTopWidth: 0,
-    borderLeftWidth: 1,
+    flexDirection: 'row', borderRadius: 28, backgroundColor: '#E8EEF6',
+    paddingVertical: 12, paddingHorizontal: 8,
+    borderTopWidth: 0, borderLeftWidth: 1,
     borderLeftColor: 'rgba(255,255,255,0.7)',
-    borderBottomWidth: 0,
-    borderRightWidth: 0,
+    borderBottomWidth: 0, borderRightWidth: 0,
   },
   navItem: { flex: 1, alignItems: 'center', gap: 5 },
   navIcon: { width: 36, height: 36, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },

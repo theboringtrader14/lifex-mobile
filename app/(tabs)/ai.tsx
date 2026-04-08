@@ -39,14 +39,13 @@ export default function AIScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: T.base }}>
       {/* Header */}
-      <View style={s.hdr}>
-        <View style={{ width: 32, height: 32 }} />
-        <Text style={[s.title, { flex: 1, textAlign: 'center' }]}>LIFEX AI</Text>
-        <View style={s.aiAvatar}><Text style={s.aiAvatarTxt}>AI</Text></View>
+      <View style={[s.hdr, { paddingTop: insets.top + 8 }]}>
+        <Text style={s.title}>LIFEX AI</Text>
+        
       </View>
 
       {/* Chat area */}
-      <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 10 }} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16 }} showsVerticalScrollIndicator={false}>
 
         {messages.length <= 1 && (
           <View style={{ gap: 8, marginBottom: 10 }}>
@@ -131,15 +130,10 @@ const s = StyleSheet.create({
   },
   aiAvatarTxt: { fontSize: 12, fontWeight: '700', color: '#FFF', fontFamily: 'Syne_700Bold' },
   userBubbleOuter: {
-    shadowColor: '#A3B1C6',
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-    elevation: 5,
-    boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
     borderRadius: 18, borderBottomRightRadius: 4,
     backgroundColor: '#E8EEF6',
     alignSelf: 'flex-end', maxWidth: '80%',
+    boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
   },
   userBubbleInner: {
     borderRadius: 18, borderBottomRightRadius: 4,
@@ -149,7 +143,7 @@ const s = StyleSheet.create({
   },
   userTxt: { fontSize: 12, fontWeight: '500', color: T.textH, lineHeight: 19, fontFamily: 'Syne_400Regular' },
   aiBubbleWrap: { alignSelf: 'flex-start', maxWidth: '80%' },
-  aiBubble: { borderRadius: 18, borderBottomLeftRadius: 4, padding: 12, paddingHorizontal: 14, backgroundColor: '#DCE4EF' },
+  aiBubble: { borderRadius: 18, borderBottomLeftRadius: 4, padding: 12, paddingHorizontal: 14, backgroundColor: '#E8EEF6', boxShadow: 'inset 5px 5px 14px rgba(143,163,188,0.6), inset -7px -7px 16px rgba(255,255,255,1)' },
   aiTag: { fontSize: 9, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: T.orange, marginBottom: 6, fontFamily: 'Syne_700Bold' },
   aiTxt: { fontSize: 12, lineHeight: 19, color: T.textB, fontFamily: 'Syne_400Regular' },
   hlTeal: { color: T.teal, fontWeight: '700', fontFamily: 'JetBrainsMono_600SemiBold' },

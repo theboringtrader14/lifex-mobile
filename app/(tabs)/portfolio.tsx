@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
-import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
+import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop, Rect, Circle, Line, Polyline } from 'react-native-svg';
 import { NeuCard } from '../../components/ui/NeuCard';
 import { NeuInset } from '../../components/ui/NeuInset';
 import { SectionLabel } from '../../components/ui/SectionLabel';
@@ -11,6 +11,41 @@ import { getPortfolio, getPortfolioSummary } from '../../src/services/api';
 
 const CHART_PATH = 'M0 90 C20 85 40 80 70 75 S110 65 140 55 S190 35 230 28 S290 20 340 10 L340 110 L0 110 Z';
 const CHART_LINE = 'M0 90 C20 85 40 80 70 75 S110 65 140 55 S190 35 230 28 S290 20 340 10';
+
+
+function AssetIcon({ emoji }: { emoji: string }) {
+  const color = T.orange;
+  const size = 20;
+  if (emoji === '📈') {
+    // Trend line with upward arrow
+    return (
+      <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+        <Polyline points="3,17 9,11 13,15 21,7" stroke={T.green} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+        <Polyline points="16,7 21,7 21,12" stroke={T.green} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      </Svg>
+    );
+  }
+  if (emoji === '💼') {
+    // Pie chart slices
+    return (
+      <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+        <Path d="M21.21 15.89A10 10 0 1 1 8 2.83" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+        <Path d="M22 12A10 10 0 0 0 12 2v10z" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+      </Svg>
+    );
+  }
+  if (emoji === '🏦') {
+    // Bank / wallet
+    return (
+      <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+        <Rect x={2} y={7} width={20} height={14} rx={2} stroke={T.purple} strokeWidth={1.8} />
+        <Path d="M16 11a2 2 0 0 1 0 4" stroke={T.purple} strokeWidth={1.8} strokeLinecap="round" />
+        <Path d="M6 3l6-1 6 1" stroke={T.purple} strokeWidth={1.8} strokeLinecap="round" />
+      </Svg>
+    );
+  }
+  return <Text style={{ fontSize: 16 }}>{emoji}</Text>;
+}
 
 export default function PortfolioScreen() {
   const insets = useSafeAreaInsets();
@@ -35,7 +70,7 @@ export default function PortfolioScreen() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View style={s.hdr}>
-        <Text style={s.title}>NET WORTH</Text>
+        <Text style={s.title}>INVEX</Text>
         <View style={{ width: 60 }} />
       </View>
 
@@ -46,7 +81,7 @@ export default function PortfolioScreen() {
       </View>
 
       {/* Equity curve */}
-      <NeuInset style={s.chartBox} borderRadius={20}>
+      <View style={s.chartBox}>
         <Svg width="100%" height={110} viewBox="0 0 340 110" preserveAspectRatio="none">
           <Defs>
             <SvgLinearGradient id="tealGrad" x1="0" y1="0" x2="0" y2="1">
@@ -57,7 +92,8 @@ export default function PortfolioScreen() {
           <Path d={CHART_PATH} fill="url(#tealGrad)" />
           <Path d={CHART_LINE} fill="none" stroke={T.teal} strokeWidth={1.8} />
         </Svg>
-      </NeuInset>
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius: 20, pointerEvents: 'none', boxShadow: 'inset 5px 5px 14px rgba(143,163,188,0.6), inset -7px -7px 16px rgba(255,255,255,1)' } as any} />
+      </View>
 
       {error && <Text style={{ color: T.red, fontSize: 11, textAlign: 'center', marginHorizontal: 16, marginTop: 4, fontFamily: 'Syne_400Regular' }}>{error}</Text>}
 
@@ -70,7 +106,7 @@ export default function PortfolioScreen() {
         <NeuCard key={a.name} style={s.assetCard} borderRadius={20} padding={0}>
           <View style={s.assetRow}>
             <View style={s.assetLeft}>
-              <View style={s.assetIcon}><Text style={{ fontSize: 16 }}>{a.emoji}</Text></View>
+              <View style={s.assetIcon}><AssetIcon emoji={a.emoji} /></View>
               <View>
                 <Text style={s.assetName}>{a.name}</Text>
                 <Text style={s.assetSub}>{a.sub}</Text>
@@ -119,11 +155,10 @@ const s = StyleSheet.create({
   chartBox: {
     marginHorizontal: 16, borderRadius: 20, overflow: 'hidden',
     height: 90, padding: 8, paddingHorizontal: 12, paddingBottom: 4,
-    backgroundColor: '#E8EEF6',
+    backgroundColor: '#D8E2EE',
     borderTopWidth: 1, borderLeftWidth: 1,
-    borderTopColor: 'rgba(143,163,188,0.4)', borderLeftColor: 'rgba(143,163,188,0.4)',
+    borderTopColor: 'rgba(143,163,188,0.5)', borderLeftColor: 'rgba(143,163,188,0.5)',
     borderBottomWidth: 0, borderRightWidth: 0,
-    boxShadow: 'inset 5px 5px 14px rgba(143,163,188,0.6), inset -4px -4px 10px rgba(255,255,255,0.95)',
   },
   assetCard: { marginHorizontal: 16, marginBottom: 14 },
   assetRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14, paddingHorizontal: 16 },
@@ -135,7 +170,7 @@ const s = StyleSheet.create({
     boxShadow: '3px 3px 6px rgba(163,177,198,0.6), -2px -2px 5px rgba(255,255,255,0.92)',
   },
   assetName: { fontSize: 13, fontWeight: '600', color: T.textH, fontFamily: 'Syne_700Bold' },
-  assetSub: { fontSize: 10, color: T.textM, marginTop: 2, fontFamily: 'Syne_400Regular' },
+  assetSub: { fontSize: 10, color: T.textM, marginTop: 2, fontFamily: 'JetBrainsMono_400Regular' },
   assetVal: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 14, fontWeight: '600', color: T.textH },
   holdingsCard: { marginHorizontal: 16, marginBottom: 10 },
   rowDiv: { height: 1, backgroundColor: 'rgba(163,177,198,0.25)', marginHorizontal: 0 },

@@ -43,7 +43,7 @@ export default function BudgetScreen() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View style={s.hdr}>
-        <Text style={s.title}>BUDGET</Text>
+        <Text style={s.title}>BUDGEX</Text>
         <View style={{ width: 60 }} />
       </View>
 
@@ -70,7 +70,7 @@ export default function BudgetScreen() {
               <Text style={s.catName}>{cat.name}</Text>
               <View style={s.catBarWrap}>
                 <NeuInset style={s.catTrack} borderRadius={6}>
-                  <View style={[s.catFill, { width: `${cat.pct}%`, backgroundColor: cat.color }]} />
+                  <View style={[s.catFill, { width: `${cat.pct}%`, backgroundColor: cat.color, boxShadow: `0 0 10px 3px ${cat.color}99, 0 0 20px 6px ${cat.color}55` }]} />
                 </NeuInset>
               </View>
               <Text style={s.catPct}>{cat.pct}%</Text>
@@ -117,14 +117,12 @@ const s = StyleSheet.create({
   hero: { alignItems: 'center', paddingHorizontal: 24, paddingVertical: 12, paddingBottom: 6 },
   heroLbl: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: T.textS, marginBottom: 6, fontFamily: 'Syne_700Bold' },
   heroVal: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 32, fontWeight: '700', color: T.textH, letterSpacing: -1 },
-  heroBudget: { fontSize: 12, color: T.textM, marginTop: 4, fontFamily: 'Syne_400Regular' },
+  heroBudget: { fontSize: 12, color: T.textM, marginTop: 4, fontFamily: 'JetBrainsMono_400Regular' },
   progressWrap: { marginHorizontal: 16, marginTop: 10 },
   progressTrack: {
     height: 10, borderRadius: 8, overflow: 'hidden',
     backgroundColor: '#E8EEF6',
-    borderTopWidth: 1, borderLeftWidth: 1,
-    borderTopColor: 'rgba(143,163,188,0.4)', borderLeftColor: 'rgba(143,163,188,0.4)',
-    borderBottomWidth: 0, borderRightWidth: 0,
+    boxShadow: 'inset 3px 3px 6px rgba(143,163,188,0.5), inset -2px -2px 4px rgba(255,255,255,0.9)',
   },
   progressFill: { height: '100%', borderRadius: 8, backgroundColor: T.purple },
   catCard: { marginHorizontal: 16 },
@@ -132,13 +130,11 @@ const s = StyleSheet.create({
   catName: { fontSize: 12, color: T.textB, fontWeight: '500', width: 56, fontFamily: 'Syne_400Regular' },
   catBarWrap: { flex: 1 },
   catTrack: {
-    height: 8, borderRadius: 6, overflow: 'hidden',
-    backgroundColor: '#E8EEF6',
-    borderTopWidth: 1, borderLeftWidth: 1,
-    borderTopColor: 'rgba(143,163,188,0.4)', borderLeftColor: 'rgba(143,163,188,0.4)',
-    borderBottomWidth: 0, borderRightWidth: 0,
+    height: 10, borderRadius: 8, overflow: 'hidden',
+    backgroundColor: '#D8E2EE',
+    boxShadow: 'inset 3px 3px 6px rgba(143,163,188,0.5), inset -2px -2px 4px rgba(255,255,255,0.9)',
   },
-  catFill: { height: '100%', borderRadius: 6 },
+  catFill: { height: '100%', borderRadius: 6, shadowColor: 'transparent' },
   catPct: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 11, color: T.textM, width: 28, textAlign: 'right' },
   catAmt: { fontFamily: 'JetBrainsMono_600SemiBold', fontSize: 11, fontWeight: '600', color: T.textH, width: 48, textAlign: 'right' },
   expCard: { marginHorizontal: 16, marginBottom: 14 },
