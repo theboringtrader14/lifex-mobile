@@ -33,6 +33,13 @@
     "plugins": [
       "expo-router",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "0917e823-83bc-45ff-9dbb-a501ed0ea9bd"
+      }
+    },
+    "owner": "bjkarthi"
   }
 }
