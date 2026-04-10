@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Platform } from 'react-native';
 import { STAAX_URL, INVEX_URL, BUDGEX_URL, BUDGEX_API_KEY } from '../config';
 
 const STAAX = axios.create({ baseURL: STAAX_URL, timeout: 10000 });
@@ -44,3 +45,30 @@ export const createExpense = (data: {
 
 export const parseExpense = (text: string) =>
   BUDGEX.post('/api/v1/parse', { text }).then((r) => r.data);
+
+export const startSession = async (): Promise<{ success: boolean; message: string }> => {
+  try {
+    await STAAX.post('/api/v1/accounts/angelone/mom/auto-login');
+    await STAAX.post('/api/v1/system/start-market-feed');
+    return { success: true, message: 'Session started' };
+  } catch (e: any) {
+    const msg = e?.response?.data?.detail ?? e?.message ?? 'Failed to start session';
+    return { success: false, message: msg };
+  }
+};
+
+export const registerPushToken = (token: string) =>
+  STAAX.post('/api/v1/mobile/register-push', { token, platform: Platform.OS }).then(r => r.data);
+
+export const getNotifications = () =>
+  STAAX.get('/api/v1/mobile/notifications').then(r => r.data);
+
+export async function checkSessionStatus(): Promise<{ smartstream: boolean; token_valid: boolean } | null> {
+  try {
+    const res = await fetch(`${API_BASE}/session/status`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}

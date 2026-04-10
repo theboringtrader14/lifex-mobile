@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import { getNotifications } from '../src/services/api';
 import Svg, { Path, Circle, Line } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { T } from '../theme';
@@ -68,6 +69,17 @@ function NotifIcon({ type, color }: { type: NotifType; color: string }) {
 
 export default function NotificationsScreen() {
   const insets = useSafeAreaInsets();
+  const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
+  const [loadingNotifs, setLoadingNotifs] = useState(true);
+
+  useEffect(() => {
+    getNotifications()
+      .then(data => {
+        if (data?.notifications?.length > 0) setNotifications(data.notifications);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingNotifs(false));
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: T.base }}>
@@ -87,7 +99,7 @@ export default function NotificationsScreen() {
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 20, paddingTop: 8 }}
         showsVerticalScrollIndicator={false}
       >
-        {MOCK_NOTIFICATIONS.map((n) => {
+        {notifications.map((n) => {
           const cfg = NOTIF_CONFIG[n.type];
           return (
             <View key={n.id} style={[s.card, { marginBottom: 12 }] as any}>
