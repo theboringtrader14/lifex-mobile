@@ -154,3 +154,46 @@ Phase 1 -- Fix data layer: field mismatches, remove mocks, add error/loading sta
 Phase 2 -- Voice flow: recording, STT, BUDGEX parse, confirmation UI, expense save
 Phase 3 -- Push notifications: Expo push tokens, FCM, algo event alerts
 Phase 4 -- Polish: Zustand cache, retry logic, biometric auth, offline mode
+
+## Session Update 2026-04-10
+
+### Completed
+- Start Session button wired in trading.tsx (inactive/starting/active states)
+- registerPushToken() added to api.ts
+- getNotifications() added to api.ts  
+- startSession() added to api.ts
+- Backend: GET /api/v1/mobile/session/status endpoint
+- Backend: POST /api/v1/mobile/register-push endpoint
+- Backend: GET /api/v1/mobile/notifications endpoint (reads event_log)
+- Backend: push_sender.py fire-and-forget Expo push via exp.host API
+- Backend: algo_runner.py wired push on SL hit, TP hit, entry, missed, error
+- Mobile Phase 1 data fixes: auth header, open positions, loading states, greeting
+- EAS Android build: complete
+
+### Pending
+- notifications.tsx: replace MOCK_NOTIFICATIONS with real API data (frontend)
+- trading.tsx: wire sessionStatus to START button states (frontend)
+- Voice flow: Phase 2 (STT, parseExpense, confirmation UI, POST /expenses)
+
+
+## Session Update 2026-04-10
+
+### Completed
+- startSession(), checkSessionStatus(), registerPushToken(), getNotifications() added to api.ts
+- Backend: GET /api/v1/mobile/session/status (smartstream + token_valid booleans)
+- Backend: POST /api/v1/mobile/register-push (saves to push_tokens.json keyed by platform)
+- Backend: GET /api/v1/mobile/notifications (reads event_log, maps prefixes to notification types)
+- Backend: push_sender.py fire-and-forget Expo push via exp.host API
+- Backend: algo_runner.py push wired on SL hit, TP hit, entry fired, entry missed, algo error
+- EAS Android build complete (2026-04-08)
+- Mobile Phase 1 data fixes: auth header, open positions, loading states, greeting
+
+### Pending Frontend Wiring (Karthik to wire)
+- trading.tsx: wire sessionStatus to START button (inactive/starting/active visual states)
+- trading.tsx: call checkSessionStatus() on mount
+- trading.tsx: call registerPushToken() once on session active
+- notifications.tsx: replace MOCK_NOTIFICATIONS with getNotifications() real API data
+
+### Pending Features
+- Voice flow Phase 2: STT, parseExpense, confirmation UI, POST /expenses
+- Push notification received handler on device
