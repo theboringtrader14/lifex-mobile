@@ -197,3 +197,36 @@ Phase 4 -- Polish: Zustand cache, retry logic, biometric auth, offline mode
 ### Pending Features
 - Voice flow Phase 2: STT, parseExpense, confirmation UI, POST /expenses
 - Push notification received handler on device
+
+
+## Session Update 2026-04-10 (Final)
+
+### Completed
+- trading.tsx: sessionStatus state (inactive/starting/active), START button fully wired
+- trading.tsx: checkSessionStatus() on mount, START button calls startSession() with result.success pattern
+- trading.tsx: push token registration useEffect with ref guard (registers once on session active)
+- notifications.tsx: MOCK_NOTIFICATIONS kept as initial fallback, useEffect fetches getNotifications(), maps body→message, created_at→timestamp, type cast with 'info' fallback, ActivityIndicator while loading
+- src/utils/pushNotifications.ts: new file — Notifications.requestPermissionsAsync() + getExpoPushTokenAsync(projectId)
+- src/config.ts: hardcoded production URLs (STAAX, INVEX, BUDGEX), BUDGEX_API_KEY from EXPO_PUBLIC env var
+
+### Bug Fixes
+- checkSessionStatus was using undefined API_BASE variable (linter regression) — fixed to use STAAX axios instance
+- push_tokens.json path in register-push and push_sender.py both corrected to backend/ directory using pathlib
+- notifications.tsx raw API data assigned without field mapping — fixed with explicit map (body→message, created_at→toLocaleString)
+
+### Git Commits
+- a6ece24: Wire Start Session button, notifications real data, checkSessionStatus fix
+- e1a5ecf: Real Expo push token via expo-notifications
+- 9211bd0: Config: always use production URLs (fixes iOS Expo Go network error)
+
+### Current State
+- iOS Expo Go: working, production URLs, push token registered
+- Android EAS build: new build needed to include config.ts URL fix
+- Push notification pipeline: device → register-push → push_tokens.json → algo_runner events → exp.host → device
+
+### Pending
+- Android EAS build: trigger new build so prod URLs are in APK
+- Voice flow Phase 2: STT recording, expo-av, parseExpense, confirmation UI, POST /expenses
+- STAAX: Karthik AO + Wife AO new SmartAPI apps (new server IP)
+- INVEX: Angel One keys expired — renew and reload
+- Apple Developer account: needed for iOS TestFlight/App Store
