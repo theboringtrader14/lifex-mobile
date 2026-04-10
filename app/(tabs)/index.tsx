@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Pressable, Dimensions, Platform, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Pressable, Dimensions, Platform, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
-import Svg, { Path } from 'react-native-svg';
 import { NeuCard } from '../../components/ui/NeuCard';
 import { NeuInset } from '../../components/ui/NeuInset';
 import { SectionLabel } from '../../components/ui/SectionLabel';
@@ -11,6 +10,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getHomeDashboard, getPortfolioSummary, getBudgetSummary, analyzeAI, createExpense } from '../../src/services/api';
 import { USER_NAME, USER_INITIAL } from '../../src/constants';
 import { Audio } from 'expo-av';
+import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Path } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
 
@@ -66,12 +67,14 @@ function parseExpenseLocally(text: string): { amount: number; category: string; 
 }
 
 export default function HomeScreen() {
+  const [unreadCount, setUnreadCount] = React.useState(3);
   const insets = useSafeAreaInsets();
 
   const [dashboard, setDashboard] = useState<any>(null);
   const [portfolioSummary, setPortfolioSummary] = useState<any>(null);
   const [budgetSummary, setBudgetSummary] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'processing' | 'confirming'>('idle');
   const [manualInput, setManualInput] = useState('');
@@ -79,9 +82,11 @@ export default function HomeScreen() {
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    getHomeDashboard().then(setDashboard).catch(() => setError('Unable to load dashboard'));
-    getPortfolioSummary().then(setPortfolioSummary).catch(() => {});
-    getBudgetSummary().then(setBudgetSummary).catch(() => {});
+    Promise.all([
+      getHomeDashboard().then(setDashboard).catch(() => setError('Unable to load dashboard')),
+      getPortfolioSummary().then(setPortfolioSummary).catch(() => {}),
+      getBudgetSummary().then(setBudgetSummary).catch(() => {}),
+    ]).finally(() => setLoading(false));
   }, []);
 
   const formatPnl = (val: number | undefined) => {
@@ -190,7 +195,7 @@ export default function HomeScreen() {
 
   const widgets = [
     { color: T.teal, label: 'NET WORTH', value: formatValue(portfolioSummary?.total_portfolio_value), sub: dayChangeStr, subColor: dayChangePct != null ? (dayChangePct >= 0 ? T.teal : T.red) : T.textM, route: '/portfolio' },
-    { color: T.orange, label: 'TRADING', value: formatPnl(dashboard?.trading?.today_pnl), sub: 'today P&L', subColor: T.textM, route: '/trading' },
+    { color: '#FF6B00', label: 'TRADING', value: formatPnl(dashboard?.trading?.today_pnl), sub: 'today P&L', subColor: T.textM, route: '/trading' },
     { color: T.purple, label: 'BUDGET', value: formatValue(budgetSummary?.monthly), sub: 'this month', subColor: T.textM, route: '/budget' },
   ];
 
@@ -258,6 +263,14 @@ export default function HomeScreen() {
     );
   };
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: T.base, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator color={T.orange} size="large" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: T.base }}
@@ -267,12 +280,31 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={s.hdr}>
         <View>
-          <Text style={s.greeting}>Good morning,</Text>
+          <Text style={s.greeting}>{(() => { const h = new Date().getHours(); return h < 12 ? 'Good morning,' : h < 18 ? 'Good afternoon,' : 'Good evening,'; })()}</Text>
           <Text style={s.name}>{USER_NAME}</Text>
         </View>
-        <View style={s.avatar}>
-          <Text style={s.avatarText}>{USER_INITIAL}</Text>
-        </View>
+        <TouchableOpacity
+          onPress={() => { setUnreadCount(0); router.push('/notifications'); }}
+        >
+          <View style={{ position: 'relative', width: 42, height: 42, boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)', borderRadius: 21 } as any}>
+            <LinearGradient
+              colors={['#1E40AF', '#14B8A6']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={s.avatar}
+            >
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                <Path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="#FFF" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+                <Path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="#FFF" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            </LinearGradient>
+            {unreadCount > 0 && (
+              <View style={s.badge}>
+                <Text style={s.badgeTxt}>{unreadCount}</Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
       </View>
 
       <SectionLabel label="OVERVIEW" />
@@ -342,16 +374,24 @@ export default function HomeScreen() {
 }
 
 const s = StyleSheet.create({
-  hdr: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 8 },
-  greeting: { fontSize: 12, color: T.textM, fontWeight: '400', fontFamily: 'Syne_400Regular' },
-  name: { fontSize: 22, fontWeight: '800', color: T.textH, letterSpacing: -0.5, fontFamily: 'Syne_700Bold' },
   avatar: {
     width: 42, height: 42, borderRadius: 21,
-    backgroundColor: T.orange,
+    backgroundColor: '#0E7490',
     alignItems: 'center', justifyContent: 'center',
     boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
   },
-  avatarText: { fontSize: 16, fontWeight: '700', color: '#FFF', fontFamily: 'Syne_700Bold' },
+  badge: {
+    position: 'absolute', top: -2, right: -2,
+    minWidth: 16, height: 16, borderRadius: 8,
+    backgroundColor: '#EF4444',
+    alignItems: 'center', justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  badgeTxt: { fontSize: 9, fontWeight: '700', color: '#FFF', fontFamily: 'Syne_700Bold' },
+  hdr: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 8 },
+  greeting: { fontSize: 12, color: T.textM, fontWeight: '400', fontFamily: 'Syne_400Regular' },
+  name: { fontSize: 22, fontWeight: '800', color: T.textH, letterSpacing: -0.5, fontFamily: 'Syne_700Bold' },
+
   widgetRow: { flexDirection: 'row', gap: 18, paddingHorizontal: 16, marginTop: 6 },
   accent: { position: 'absolute', top: 0, left: 0, right: 0, height: 3 },
   dot: { width: 7, height: 7, borderRadius: 3.5, marginBottom: 8 },

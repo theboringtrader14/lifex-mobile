@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { NeuCard } from '../../components/ui/NeuCard';
 import { SectionLabel } from '../../components/ui/SectionLabel';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getSystemStats, getOrders, getAlgos } from '../../src/services/api';
+import { getSystemStats, getOrders, getAlgos, getHomeDashboard } from '../../src/services/api';
 
 export default function TradingScreen() {
   const insets = useSafeAreaInsets();
@@ -15,11 +15,16 @@ export default function TradingScreen() {
   const [orders, setOrders] = useState<any[]>([]);
   const [algos, setAlgos] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [mode, setMode] = useState<string>('PRACTIX');
 
   useEffect(() => {
-    getSystemStats().then(setStats).catch(() => setError('Unable to load stats'));
-    getOrders().then(d => setOrders(Array.isArray(d) ? d : d?.items ?? [])).catch(() => {});
-    getAlgos().then(d => setAlgos(Array.isArray(d) ? d : d?.items ?? [])).catch(() => {});
+    Promise.all([
+      getSystemStats().then(setStats).catch(() => setError('Unable to load stats')),
+      getOrders().then(d => setOrders(Array.isArray(d) ? d : d?.items ?? [])).catch(() => {}),
+      getAlgos().then(d => setAlgos(Array.isArray(d) ? d : d?.items ?? [])).catch(() => {}),
+      getHomeDashboard().then(d => setMode(d?.trading?.mode ?? 'PRACTIX')).catch(() => {}),
+    ]).finally(() => setLoading(false));
   }, []);
 
   const formatPnl = (val: number | undefined) => {
@@ -53,11 +58,20 @@ export default function TradingScreen() {
     pnlColor: (o.pnl ?? o.realized_pnl ?? 0) >= 0 ? T.green : T.red,
   }));
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: T.base, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator color={T.orange} size="large" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={s.hdr}>
         <Text style={s.title}>STAAX</Text>
+        <Text style={{ fontSize: 10, fontWeight: '700', color: T.orange, fontFamily: 'Syne_700Bold', letterSpacing: 1 }}>{mode}</Text>
       </View>
 
       {error && <Text style={{ color: T.red, fontSize: 11, textAlign: 'center', marginHorizontal: 16, marginTop: 4, fontFamily: 'Syne_400Regular' }}>{error}</Text>}
@@ -97,7 +111,27 @@ export default function TradingScreen() {
       </NeuCard>
 
       <SectionLabel label="OPEN POSITIONS" style={{ marginTop: 14 }} />
-      <Text style={s.emptyText}>No open positions today</Text>
+      {(() => {
+        const openPositions = orders.filter(o => o.status === 'open' || o.status === 'OPEN');
+        if (openPositions.length === 0) {
+          return <Text style={s.emptyText}>No open positions today</Text>;
+        }
+        return openPositions.map(o => (
+          <NeuCard key={o.id} style={s.tradeCard} borderRadius={20} padding={0}>
+            <View style={s.tradeRow}>
+              <View>
+                <Text style={s.tradeName}>{o.algo_name ?? o.algo_id ?? 'Unknown'}</Text>
+                <Text style={s.tradeType}>{o.symbol ?? 'NIFTY'} · {o.order_type ?? 'Intraday'}</Text>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={[s.tradePnl, { color: (o.pnl ?? o.unrealized_pnl ?? 0) >= 0 ? T.green : T.red }]}>
+                  {formatPnl(o.pnl ?? o.unrealized_pnl)}
+                </Text>
+              </View>
+            </View>
+          </NeuCard>
+        ));
+      })()}
 
       <SectionLabel label="RECENT TRADES" style={{ marginTop: 14 }} />
       {tradeRows.length > 0 ? tradeRows.map((t) => (

@@ -39,7 +39,7 @@ export default function AIScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: T.base }}>
       {/* Header */}
-      <View style={[s.hdr, { paddingTop: insets.top + 8 }]}>
+      <View style={[s.hdr, { paddingTop: insets.top + 20 }]}>
         <Text style={s.title}>LIFEX AI</Text>
         
       </View>
@@ -119,7 +119,7 @@ export default function AIScreen() {
 }
 
 const s = StyleSheet.create({
-  hdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 12 },
+  hdr: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingBottom: 12 },
   backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backTxt: { fontSize: 13, fontWeight: '600', color: T.textB, fontFamily: 'Syne_700Bold' },
   title: { fontSize: 15, fontWeight: '700', color: T.textH, letterSpacing: 0.5, textTransform: 'uppercase', fontFamily: 'Syne_700Bold' },

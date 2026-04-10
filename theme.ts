@@ -8,7 +8,7 @@ export const T = {
   textB: '#5A6680',
   textM: '#8A96B0',
   textS: '#9AA3BB',
-  orange: '#FF6B00',
+  orange: '#1E40AF',
   teal: '#00C9A7',
   purple: '#7C3AED',
   green: '#22DD88',

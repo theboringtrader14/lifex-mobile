@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop, Rect, Circle, Line, Polyline } from 'react-native-svg';
 import { NeuCard } from '../../components/ui/NeuCard';
@@ -9,8 +9,8 @@ import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getPortfolio, getPortfolioSummary } from '../../src/services/api';
 
-const CHART_PATH = 'M0 90 C20 85 40 80 70 75 S110 65 140 55 S190 35 230 28 S290 20 340 10 L340 110 L0 110 Z';
-const CHART_LINE = 'M0 90 C20 85 40 80 70 75 S110 65 140 55 S190 35 230 28 S290 20 340 10';
+const CHART_PATH = 'M0 85 C40 80 70 72 110 64 S160 52 200 42 S260 28 300 18 S325 12 340 10 L340 100 L0 100 Z';
+const CHART_LINE = 'M0 85 C40 80 70 72 110 64 S160 52 200 42 S260 28 300 18 S325 12 340 10';
 
 
 function AssetIcon({ emoji }: { emoji: string }) {
@@ -53,10 +53,13 @@ export default function PortfolioScreen() {
   const [summary, setSummary] = useState<any>(null);
   const [holdings, setHoldings] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getPortfolioSummary().then(setSummary).catch(() => setError('Unable to load portfolio'));
-    getPortfolio().then(d => setHoldings(Array.isArray(d) ? d : d?.holdings ?? [])).catch(() => {});
+    Promise.all([
+      getPortfolioSummary().then(setSummary).catch(() => setError('Unable to load portfolio')),
+      getPortfolio().then(d => setHoldings(Array.isArray(d) ? d : d?.holdings ?? [])).catch(() => {}),
+    ]).finally(() => setLoading(false));
   }, []);
 
   const formatValue = (val: number | undefined) => {
@@ -66,6 +69,14 @@ export default function PortfolioScreen() {
     if (val >= 1000) return `₹${(val / 1000).toFixed(1)}K`;
     return `₹${Math.round(val)}`;
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: T.base, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator color={T.teal} size="large" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
@@ -82,15 +93,28 @@ export default function PortfolioScreen() {
 
       {/* Equity curve */}
       <View style={s.chartBox}>
-        <Svg width="100%" height={110} viewBox="0 0 340 110" preserveAspectRatio="none">
+        <Svg width="100%" height={100} viewBox="0 0 340 100" preserveAspectRatio="none">
           <Defs>
             <SvgLinearGradient id="tealGrad" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0" stopColor={T.teal} stopOpacity={0.25} />
-              <Stop offset="1" stopColor={T.teal} stopOpacity={0.02} />
+              <Stop offset="0" stopColor={T.teal} stopOpacity={0.5} />
+              <Stop offset="1" stopColor={T.teal} stopOpacity={0.05} />
+            </SvgLinearGradient>
+            <SvgLinearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+              <Stop offset="0" stopColor={T.teal} stopOpacity={0.4} />
+              <Stop offset="1" stopColor={T.teal} stopOpacity={1} />
             </SvgLinearGradient>
           </Defs>
+          {/* Grid lines */}
+          <Path d="M0 25 L340 25" stroke="rgba(163,177,198,0.2)" strokeWidth={1} />
+          <Path d="M0 50 L340 50" stroke="rgba(163,177,198,0.2)" strokeWidth={1} />
+          <Path d="M0 75 L340 75" stroke="rgba(163,177,198,0.2)" strokeWidth={1} />
+          {/* Gradient fill */}
           <Path d={CHART_PATH} fill="url(#tealGrad)" />
-          <Path d={CHART_LINE} fill="none" stroke={T.teal} strokeWidth={1.8} />
+          {/* Line */}
+          <Path d={CHART_LINE} fill="none" stroke={T.teal} strokeWidth={1.5} strokeLinecap="round" />
+          {/* Glow dot at end */}
+          <Circle cx={332} cy={10} r={5} fill={T.teal} opacity={0.3} />
+          <Circle cx={332} cy={10} r={3} fill={T.teal} />
         </Svg>
         <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius: 20, pointerEvents: 'none', boxShadow: 'inset 5px 5px 14px rgba(143,163,188,0.6), inset -7px -7px 16px rgba(255,255,255,1)' } as any} />
       </View>
@@ -154,11 +178,9 @@ const s = StyleSheet.create({
   heroGain: { fontSize: 13, color: T.green, fontWeight: '600', marginTop: 4, fontFamily: 'Syne_700Bold' },
   chartBox: {
     marginHorizontal: 16, borderRadius: 20, overflow: 'hidden',
-    height: 90, padding: 8, paddingHorizontal: 12, paddingBottom: 4,
-    backgroundColor: '#D8E2EE',
-    borderTopWidth: 1, borderLeftWidth: 1,
-    borderTopColor: 'rgba(143,163,188,0.5)', borderLeftColor: 'rgba(143,163,188,0.5)',
-    borderBottomWidth: 0, borderRightWidth: 0,
+    height: 110,
+    backgroundColor: '#E8EEF6',
+    paddingHorizontal: 12, paddingVertical: 8,
   },
   assetCard: { marginHorizontal: 16, marginBottom: 14 },
   assetRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14, paddingHorizontal: 16 },

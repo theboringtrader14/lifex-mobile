@@ -40,7 +40,7 @@ export function MicButton({ onPress, listening = false }: Props) {
         style={{
           position: 'absolute',
           width: 90, height: 90, borderRadius: 45,
-          borderWidth: 2, borderColor: 'rgba(255,107,0,0.35)',
+          borderWidth: 2, borderColor: 'rgba(30,64,175,0.35)',
           transform: [{ scale: ring1Scale }],
           opacity: ring1Opacity,
         }}
@@ -50,7 +50,7 @@ export function MicButton({ onPress, listening = false }: Props) {
         style={{
           position: 'absolute',
           width: 110, height: 110, borderRadius: 55,
-          borderWidth: 1.5, borderColor: 'rgba(255,107,0,0.2)',
+          borderWidth: 1.5, borderColor: 'rgba(30,64,175,0.2)',
           transform: [{ scale: ring2Scale }],
           opacity: ring2Opacity,
         }}

@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { STAAX_URL, INVEX_URL, BUDGEX_URL } from '../config';
+import { STAAX_URL, INVEX_URL, BUDGEX_URL, BUDGEX_API_KEY } from '../config';
 
 const STAAX = axios.create({ baseURL: STAAX_URL, timeout: 10000 });
 const INVEX = axios.create({ baseURL: INVEX_URL, timeout: 10000 });
-const BUDGEX = axios.create({ baseURL: BUDGEX_URL, timeout: 10000 });
+const BUDGEX = axios.create({ baseURL: BUDGEX_URL, timeout: 10000, headers: { 'x-api-key': BUDGEX_API_KEY } });
 
 export const getHomeDashboard = () =>
   STAAX.get('/api/v1/mobile/dashboard').then(r => r.data);

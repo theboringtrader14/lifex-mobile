@@ -9,3 +9,4 @@ const PROD_BUDGEX = 'https://budgex.lifexos.co.in';
 export const STAAX_URL = __DEV__ ? DEV_STAAX : PROD_STAAX;
 export const INVEX_URL = __DEV__ ? DEV_INVEX : PROD_INVEX;
 export const BUDGEX_URL = __DEV__ ? DEV_BUDGEX : PROD_BUDGEX;
+export const BUDGEX_API_KEY = 'budgex-dev-secret';

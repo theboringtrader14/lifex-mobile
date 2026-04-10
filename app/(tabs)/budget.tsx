@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { NeuCard } from '../../components/ui/NeuCard';
@@ -23,14 +23,17 @@ export default function BudgetScreen() {
   const [budgetData, setBudgetData] = useState<any>(null);
   const [recentExpenses, setRecentExpenses] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const CAT_EMOJI: Record<string, string> = {
     Food: '🍔', Travel: '🚗', Bills: '⚡', Shopping: '🛍️', Others: '💰',
   };
 
   useEffect(() => {
-    getBudgetSummary().then(setBudgetData).catch(() => setError('Unable to load budget'));
-    getRecentExpenses(5).then(data => setRecentExpenses(Array.isArray(data) ? data : [])).catch(() => {});
+    Promise.all([
+      getBudgetSummary().then(setBudgetData).catch(() => setError('Unable to load budget')),
+      getRecentExpenses(5).then(data => setRecentExpenses(Array.isArray(data) ? data : [])).catch(() => {}),
+    ]).finally(() => setLoading(false));
   }, []);
 
   const formatValue = (val: number | undefined) => {
@@ -39,6 +42,14 @@ export default function BudgetScreen() {
     if (val >= 1000) return `₹${(val / 1000).toFixed(1)}K`;
     return `₹${Math.round(val)}`;
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: T.base, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator color={T.purple} size="large" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: T.base }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>

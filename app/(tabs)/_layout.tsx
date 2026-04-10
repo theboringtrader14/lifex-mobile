@@ -4,6 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Svg, { Path, Polyline, Circle, Rect, Line } from 'react-native-svg';
 import { T } from '../../theme';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const isWeb = typeof document !== 'undefined';
@@ -52,7 +53,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   return (
     <View style={[styles.navWrap, { paddingBottom: insets.bottom > 0 ? insets.bottom - 8 : 8, backgroundColor: 'transparent' }]}>
       {/* Outer — dark bottom shadow */}
-      <View style={styles.navOuter}>
+      <View style={styles.navOuter} renderToHardwareTextureAndroid={true}>
         {/* Inner — white top highlight border */}
         <View style={styles.navCard}>
           {state.routes.map((route, idx) => {
@@ -113,6 +114,7 @@ const styles = StyleSheet.create({
   navOuter: {
     borderRadius: 28,
     backgroundColor: '#E8EEF6',
+    overflow: 'hidden',
     boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)',
   },
   navCard: {
