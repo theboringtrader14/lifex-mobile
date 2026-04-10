@@ -7,6 +7,7 @@ import { SectionLabel } from '../../components/ui/SectionLabel';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getSystemStats, getOrders, getAlgos, getHomeDashboard, startSession, checkSessionStatus, registerPushToken } from '../../src/services/api';
+import { getExpoPushToken } from '../../src/utils/pushNotifications';
 
 export default function TradingScreen() {
   const insets = useSafeAreaInsets();
@@ -35,7 +36,9 @@ export default function TradingScreen() {
   useEffect(() => {
     if (sessionStatus === 'active' && !pushRegistered.current) {
       pushRegistered.current = true;
-      registerPushToken('expo-token-placeholder').catch(() => {});
+      getExpoPushToken().then(token => {
+        if (token) registerPushToken(token).catch(() => {});
+      }).catch(() => {});
     }
   }, [sessionStatus]);
 
