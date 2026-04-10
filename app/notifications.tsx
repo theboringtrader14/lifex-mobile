@@ -74,8 +74,17 @@ export default function NotificationsScreen() {
 
   useEffect(() => {
     getNotifications()
-      .then(data => {
-        if (data?.notifications?.length > 0) setNotifications(data.notifications);
+      .then((data: any) => {
+        if (data?.notifications?.length > 0) {
+          setNotifications(data.notifications.map((n: any) => ({
+            id: String(n.id),
+            type: (n.type as NotifType) || 'info',
+            title: n.title || 'Notification',
+            message: n.body || '',
+            timestamp: n.created_at ? new Date(n.created_at).toLocaleString('en-IN') : '',
+            read: n.read ?? true,
+          })));
+        }
       })
       .catch(() => {})
       .finally(() => setLoadingNotifs(false));
@@ -95,6 +104,7 @@ export default function NotificationsScreen() {
         </TouchableOpacity>
       </View>
 
+      {loadingNotifs && <ActivityIndicator color={T.orange} style={{ marginTop: 20 }} />}
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 20, paddingTop: 8 }}
         showsVerticalScrollIndicator={false}

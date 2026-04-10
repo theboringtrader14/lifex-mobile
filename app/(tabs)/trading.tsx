@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { router } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { NeuCard } from '../../components/ui/NeuCard';
 import { SectionLabel } from '../../components/ui/SectionLabel';
 import { T } from '../../theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getSystemStats, getOrders, getAlgos, getHomeDashboard, startSession, checkSessionStatus} from '../../src/services/api';
+import { getSystemStats, getOrders, getAlgos, getHomeDashboard, startSession, checkSessionStatus, registerPushToken } from '../../src/services/api';
 
 export default function TradingScreen() {
   const insets = useSafeAreaInsets();
@@ -18,6 +18,7 @@ export default function TradingScreen() {
   const [loading, setLoading] = useState(true);
   const [sessionStatus, setSessionStatus] = useState<'inactive'|'starting'|'active'>('inactive');
   const [mode, setMode] = useState<string>('PRACTIX');
+  const pushRegistered = useRef(false);
 
   useEffect(() => {
     Promise.all([
@@ -30,6 +31,13 @@ export default function TradingScreen() {
       }).catch(() => {}),
     ]).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (sessionStatus === 'active' && !pushRegistered.current) {
+      pushRegistered.current = true;
+      registerPushToken('expo-token-placeholder').catch(() => {});
+    }
+  }, [sessionStatus]);
 
   const formatPnl = (val: number | undefined) => {
     if (val === undefined || val === null) return '...';
@@ -80,19 +88,18 @@ export default function TradingScreen() {
           onPress={async () => {
             if (sessionStatus !== 'inactive') return;
             setSessionStatus('starting');
-            try {
-              if (typeof startSession !== 'function') throw new Error('startSession not implemented');
-              await startSession();
+            const result = await startSession();
+            if (result.success) {
               setSessionStatus('active');
-            } catch (e: any) {
+            } else {
               setSessionStatus('inactive');
-              Alert.alert('Session Failed', e?.message ?? 'Could not start session');
+              Alert.alert('Session Failed', result.message);
             }
           }}
         >
           <View style={{ paddingHorizontal: 14, paddingVertical: 4, borderRadius: 20, backgroundColor: '#E8EEF6', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 10px rgba(163,177,198,0.6), -3px -3px 8px rgba(255,255,255,0.92)' } as any}>
             <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, color: sessionStatus === 'active' ? '#22DD88' : T.orange, fontFamily: 'Syne_700Bold' }}>
-              {sessionStatus === 'starting' ? 'STARTING...' : sessionStatus === 'active' ? 'ACTIVE' : 'START'}
+              {sessionStatus === 'starting' ? 'STARTING...' : sessionStatus === 'active' ? '✅ ACTIVE' : '⚡ START'}
             </Text>
           </View>
         </TouchableOpacity>

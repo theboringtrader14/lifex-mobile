@@ -63,12 +63,5 @@ export const registerPushToken = (token: string) =>
 export const getNotifications = () =>
   STAAX.get('/api/v1/mobile/notifications').then(r => r.data);
 
-export async function checkSessionStatus(): Promise<{ smartstream: boolean; token_valid: boolean } | null> {
-  try {
-    const res = await fetch(`${API_BASE}/session/status`);
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
+export const checkSessionStatus = (): Promise<{ smartstream: boolean; token_valid: boolean } | null> =>
+  STAAX.get('/api/v1/mobile/session/status').then(r => r.data).catch(() => null);
