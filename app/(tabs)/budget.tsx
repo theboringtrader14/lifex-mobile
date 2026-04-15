@@ -71,7 +71,11 @@ export default function BudgetScreen() {
         </NeuInset>
       </View>
 
-      {error && <Text style={{ color: T.red, fontSize: 11, textAlign: 'center', marginHorizontal: 16, marginTop: 4, fontFamily: 'Syne_400Regular' }}>{error}</Text>}
+      {error && (
+        <View style={{ backgroundColor: 'rgba(255,68,68,0.12)', borderRadius: 8, padding: 12, margin: 16, borderWidth: 1, borderColor: '#FF4444' }}>
+          <Text style={{ color: '#FF4444', fontSize: 12, fontFamily: 'Inter' }}>{error}</Text>
+        </View>
+      )}
 
       <SectionLabel label="BY CATEGORY" style={{ marginTop: 16 }} />
       <NeuCard style={s.catCard} borderRadius={20} overflow="hidden" padding={0}>

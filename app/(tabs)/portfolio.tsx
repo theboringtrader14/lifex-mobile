@@ -119,7 +119,11 @@ export default function PortfolioScreen() {
         <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius: 20, pointerEvents: 'none', boxShadow: 'inset 5px 5px 14px rgba(143,163,188,0.6), inset -7px -7px 16px rgba(255,255,255,1)' } as any} />
       </View>
 
-      {error && <Text style={{ color: T.red, fontSize: 11, textAlign: 'center', marginHorizontal: 16, marginTop: 4, fontFamily: 'Syne_400Regular' }}>{error}</Text>}
+      {error && (
+        <View style={{ backgroundColor: 'rgba(255,68,68,0.12)', borderRadius: 8, padding: 12, margin: 16, borderWidth: 1, borderColor: '#FF4444' }}>
+          <Text style={{ color: '#FF4444', fontSize: 12, fontFamily: 'Inter' }}>{error}</Text>
+        </View>
+      )}
 
       <SectionLabel label="BREAKDOWN" style={{ marginTop: 16 }} />
       {[

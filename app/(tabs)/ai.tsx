@@ -17,6 +17,7 @@ export default function AIScreen() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSend = async (text?: string) => {
     const msg = text ?? input.trim();
@@ -25,10 +26,12 @@ export default function AIScreen() {
     setInput('');
     setLoading(true);
     try {
+      setError(null);
       const res = await analyzeAI(msg);
       const reply = res?.response ?? res?.message ?? res?.answer ?? 'No response received.';
       setMessages(prev => [...prev, { role: 'ai', text: reply }]);
-    } catch {
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load data');
       setMessages(prev => [...prev, { role: 'ai', text: 'Unable to reach AI. Check your connection.' }]);
     } finally {
       setLoading(false);
@@ -43,6 +46,12 @@ export default function AIScreen() {
         <Text style={s.title}>LIFEX AI</Text>
         
       </View>
+
+      {error && (
+        <View style={{ backgroundColor: 'rgba(255,68,68,0.12)', borderRadius: 8, padding: 12, margin: 16, borderWidth: 1, borderColor: '#FF4444' }}>
+          <Text style={{ color: '#FF4444', fontSize: 12, fontFamily: 'Inter' }}>{error}</Text>
+        </View>
+      )}
 
       {/* Chat area */}
       <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16 }} showsVerticalScrollIndicator={false}>

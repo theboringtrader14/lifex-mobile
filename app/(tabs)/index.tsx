@@ -337,9 +337,9 @@ export default function HomeScreen() {
       </NeuCard>
 
       {error && (
-        <Text style={{ color: T.red, fontSize: 11, textAlign: 'center', marginHorizontal: 16, marginTop: 8, fontFamily: 'Syne_400Regular' }}>
-          {error}
-        </Text>
+        <View style={{ backgroundColor: 'rgba(255,68,68,0.12)', borderRadius: 8, padding: 12, margin: 16, borderWidth: 1, borderColor: '#FF4444' }}>
+          <Text style={{ color: '#FF4444', fontSize: 12, fontFamily: 'Inter' }}>{error}</Text>
+        </View>
       )}
 
       <SectionLabel label="LIFEX AI" style={{ marginTop: 14 }} />
